@@ -1,8 +1,9 @@
 # README
 Styles are fixed
 
-Table<img width="1728" alt="Screenshot 2024-12-09 at 01 05 11" src="https://github.com/user-attachments/assets/07baf9ce-3a55-499e-bde6-ccc492abcb59">
+Table
 
+<img width="1354" alt="Screenshot 2024-12-09 at 01 05 16" src="https://github.com/user-attachments/assets/f0acca02-a746-4861-9d31-97f64cffc224">
 
 
 
