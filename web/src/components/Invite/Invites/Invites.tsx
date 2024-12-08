@@ -1,5 +1,4 @@
-import type {FindInvites,} from 'types/graphql'
-import React, {useState} from "react";
+import React, {FC, useState} from "react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
@@ -14,6 +13,7 @@ import {
 } from '@/components/ui/pagination';
 import {EStatus} from "@/enums/invite-status.enum";
 import {formatDate} from "@/helpers/date/formatDate";
+import {IInvite} from "src/interfaces/invite.interface";
 
 
 const statusColors = {
@@ -23,13 +23,29 @@ const statusColors = {
   deactivated: 'bg-red-500 hover:bg-red-600',
 };
 
- const Invites = ({ invites }: FindInvites) => {
+
+export interface IProps {
+  onUpdateInvite: (id: number) => void
+  onResendInvite: (id: number, inviteDuration: number) => void
+  invites: IInvite[]
+}
+
+ const Invites: FC<IProps> = ({invites, onResendInvite, onUpdateInvite}) => {
    const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isOpen, setIsOpen] = useState(false);
 
 
    const totalPages =  1;
+
+
+   const handleDeactivate =  (id: number) => {
+     onUpdateInvite(id)
+   };
+
+   const handleResend = async (id: number, duration: number) => {
+     onResendInvite(id, duration)
+   };
 
   return   (<>
     <div className="flex justify-end">
@@ -92,7 +108,7 @@ const statusColors = {
                         <Button
                           variant="secondary"
                           size="sm"
-                          // onClick={() => handleDeactivate(invite.id)}
+                          onClick={() => handleDeactivate(invite.id)}
                         >
                           Deactivate
                         </Button>
@@ -100,7 +116,7 @@ const statusColors = {
                       <Button
                         variant="outline"
                         size="sm"
-                        // onClick={() => handleResend(invite.id)}
+                        onClick={() => handleResend(invite.id, invite.inviteDuration)}
                       >
                         Resend
                       </Button>

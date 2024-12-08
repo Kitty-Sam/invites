@@ -32,21 +32,19 @@ export const schema = gql`
   }
 
   input UpdateInviteInput {
-    email: String
-    companyName: String
-    firstName: String
-    lastName: String
-    jobTitle: String
-    inviteDuration: Int
-    message: String
+    id: Int!
     status: String
-    expiresIn: DateTime
+  }
+
+  input ResendInviteInput {
+    id: Int!
+    inviteDuration: Int!
   }
 
   type Mutation {
-    resendInvite(id: Int!): Invite! @requireAuth
-    createInvite(input: CreateInviteInput!): Invite! @requireAuth
+    resendInvite(id: Int!, input: ResendInviteInput!): Invite! @requireAuth
     updateInvite(id: Int!, input: UpdateInviteInput!): Invite! @requireAuth
+    createInvite(input: CreateInviteInput!): Invite! @requireAuth
     deleteInvite(id: Int!): Invite! @requireAuth
   }
 `

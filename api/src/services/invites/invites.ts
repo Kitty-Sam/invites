@@ -35,11 +35,13 @@ export const deleteInvite: MutationResolvers['deleteInvite'] = ({ id }) => {
 }
 
 
-export const resendInvite: MutationResolvers['resendInvite'] = ({ id }) => {
+export const resendInvite: MutationResolvers['resendInvite'] = ({ id, input }) => {
   return db.invite.update({
     where: { id },
     data: {
-      createdAt: new Date(),
+      status: 'active',
+      expiresIn: new Date(new Date().getTime() + Number(input.inviteDuration) * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: new Date().toISOString(),
     },
   })
 }

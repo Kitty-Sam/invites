@@ -1,9 +1,9 @@
 import type {FindInvites, FindInvitesVariables} from 'types/graphql'
-import type {CellFailureProps, CellSuccessProps, TypedDocumentNode,} from '@redwoodjs/web'
+import {CellFailureProps, CellSuccessProps, TypedDocumentNode, useMutation,} from '@redwoodjs/web'
 import Invites from "@/components/Invite/Invites/Invites";
 import {NewInvite} from "@/components/Invite/NewInvite/NewInvite";
 import React, {useState} from "react";
-
+import {EStatus} from "@/enums/invite-status.enum";
 
 
 export const QUERY: TypedDocumentNode<FindInvites, FindInvitesVariables> = gql`
@@ -21,6 +21,25 @@ export const QUERY: TypedDocumentNode<FindInvites, FindInvitesVariables> = gql`
       expiresIn
       createdAt
       updatedAt
+    }
+  }
+`
+// Мутация для обновления статуса приглашения
+const UPDATE_INVITE = gql`
+  mutation UpdateInviteMutation($id: Int!, $input: UpdateInviteInput!) {
+    updateInvite(id: $id, input: $input) {
+      id
+      status
+    }
+  }
+`
+
+// Мутация для повторной отправки приглашения
+const RESEND_INVITE = gql`
+  mutation ResendInviteMutation($id: Int!, $input: ResendInviteInput!) {
+    resendInvite(id: $id, input: $input) {
+      id
+      inviteDuration
     }
   }
 `
@@ -45,5 +64,48 @@ export const Failure = ({error}: CellFailureProps<FindInvites>) => (
 export const Success = ({
                           invites,
                         }: CellSuccessProps<FindInvites, FindInvitesVariables>) => {
-  return  <Invites invites={invites}/>
+  const [updateCurrentInvite, { loading: updating, error: updateError }] = useMutation(
+    UPDATE_INVITE,
+    {
+      refetchQueries: [{ query: QUERY }],
+      onCompleted: (data) => {
+        console.log('Invite updated:', data)
+      },
+    }
+  )
+
+  const [resendCurrentInvite, { loading: resending, error: resendError }] = useMutation(
+    RESEND_INVITE,
+    {
+      refetchQueries: [{ query: QUERY }],
+      onCompleted: (data) => {
+        console.log('Invite resent:', data)
+      },
+    }
+  )
+
+  const handleResendInvite = (id: number, inviteDuration: number) => {
+    resendCurrentInvite({
+      variables: {
+        id,
+        input: {
+          id,
+          inviteDuration,
+        },
+      },
+    })
+  }
+
+  const handleUpdateInvite = (id: number) => {
+    updateCurrentInvite({
+      variables: {
+        id,
+        input: { id, status: EStatus.DEACTIVATED },
+      },
+    })
+  }
+
+  return  <Invites invites={invites}
+                   onUpdateInvite={handleUpdateInvite}
+                   onResendInvite={handleResendInvite}/>
 }
