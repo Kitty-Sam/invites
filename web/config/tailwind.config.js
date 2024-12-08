@@ -1,6 +1,6 @@
 module.exports = {
   darkMode: ["class"],
-  content: ['src/**/*.{js,jsx,ts,tsx}'],
+  content: ['src/**/*.{js,jsx,ts,tsx}' ],
   theme: {
     container: {
       center: true,
@@ -16,13 +16,21 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // primary: {
+        //   DEFAULT: "hsl(var(--primary))",
+        //   foreground: "hsl(var(--primary-foreground))",
+        // },
+        // secondary: {
+        //   DEFAULT: "hsl(var(--secondary))",
+        //   foreground: "hsl(var(--secondary-foreground))",
+        // },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#007bff", // Основной цвет
+          foreground: "#ffffff", // Цвет текста для primary
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#F4F4F5", // Вторичный цвет
+          foreground: "#1f2937", // Цвет текста для secondary
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

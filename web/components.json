@@ -10,8 +10,7 @@
     "baseColor": "neutral",
     "config": "./config/tailwind.config.js",
     "css": "./src/index.css",
-    "cssVariables": true,
-    "prefix": "tw-"
+    "cssVariables": true
   },
   "tsx": true,
   "rsc": false

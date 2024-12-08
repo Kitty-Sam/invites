@@ -4,25 +4,17 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {NewInvite} from "@/components/Invite/NewInvite/NewInvite";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {EStatus} from "@/enums/invite-status.enum";
+import {formatDate} from "@/helpers/date/formatDate";
 
-export const formatDate = (dateString: Date| string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
-
-export enum EStatus {
-  ACTIVE = 'active',
-  ACCEPTED = 'accepted',
-  EXPIRED = 'expired',
-  DEACTIVATED = 'deactivated',
-}
 
 const statusColors = {
   active: 'bg-blue-500 hover:bg-blue-600',
@@ -32,8 +24,12 @@ const statusColors = {
 };
 
  const Invites = ({ invites }: FindInvites) => {
+   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isOpen, setIsOpen] = useState(false);
+
+
+   const totalPages =  1;
 
   return   (<>
     <div className="flex justify-end">
@@ -116,6 +112,35 @@ const statusColors = {
         </Table>
       </div>
     </div>
+    {totalPages ? (
+      <div className="p-4 space-y-4 bg-gray-100">
+        <Pagination className="flex justify-end">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isActive={currentPage !== 1}
+              />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page}>
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                isActive={currentPage !== totalPages}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    ) : (
+      <></>
+    )}
   </>)
 }
 
