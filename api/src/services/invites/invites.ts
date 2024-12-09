@@ -2,15 +2,42 @@ import type { QueryResolvers, MutationResolvers } from 'types/graphql'
 
 import { db } from 'src/lib/db'
 
-export const invites: QueryResolvers['invites'] = () => {
-  return db.invite.findMany()
-}
 
-export const invite: QueryResolvers['invite'] = ({ id }) => {
-  return db.invite.findUnique({
-    where: { id },
-  })
-}
+export const invites: QueryResolvers['invites'] = async ({page = 1, pageSize = 2, whereCondition = {status: 'all', lastName: ''}}) => {
+  const skip = (page - 1) * pageSize;
+
+  const statusCondition = whereCondition.status !== 'all' ? {status: whereCondition.status }: {};
+
+  const nameCondition =
+    whereCondition.lastName !== ''
+    ? {
+      lastName: {startsWith: whereCondition.lastName},
+    }
+    : {};
+
+
+  const combinedWhereCondition = {
+    ...statusCondition,
+    ...nameCondition,
+  };
+
+
+  const [invites, totalItems] = await Promise.all([
+    db.invite.findMany({
+      where: combinedWhereCondition,
+      skip,
+      take: pageSize,
+    }),
+    db.invite.count({
+      where: combinedWhereCondition,
+    }),
+  ]);
+
+  return {
+    invites,
+    totalItems,
+  };
+};
 
 export const createInvite: MutationResolvers['createInvite'] = ({ input }) => {
   return db.invite.create({

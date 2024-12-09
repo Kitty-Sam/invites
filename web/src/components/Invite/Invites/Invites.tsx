@@ -1,4 +1,4 @@
-import React, {FC, useState} from "react";
+import React, {FC, useState, useTransition} from "react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/pagination';
 import {EStatus} from "@/enums/invite-status.enum";
 import {formatDate} from "@/helpers/date/formatDate";
+import {InputCustom} from "@/components/Invite/InputCustom/InputCustom";
 import {IInvite} from "src/interfaces/invite.interface";
 
 
@@ -27,13 +28,21 @@ const statusColors = {
 export interface IProps {
   onUpdateInvite: (id: number) => void
   onResendInvite: (id: number, inviteDuration: number) => void
+  setSelectedStatus: (status: string) => void
+  selectedStatus: string
+  searchQuery: string
+  setSearchQuery: (value: string) => void
+  setCurrentPage: any
+  currentPage: number
   invites: IInvite[]
+  totalItems: number
 }
 
- const Invites: FC<IProps> = ({invites, onResendInvite, onUpdateInvite}) => {
-   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState('all');
+ const Invites: FC<IProps> = ({invites, onResendInvite, onUpdateInvite, setSelectedStatus, selectedStatus, setCurrentPage, currentPage, searchQuery, setSearchQuery}) => {
+   // const [currentPage, setCurrentPage] = useState(1);
+  // const [selectedStatus, setSelectedStatus] = useState('all');
   const [isOpen, setIsOpen] = useState(false);
+   const [_, startTransition] = useTransition();
 
 
    const totalPages =  1;
@@ -47,7 +56,26 @@ export interface IProps {
      onResendInvite(id, duration)
    };
 
+   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+     const value = e.target.value;
+     startTransition(() => {
+       setSearchQuery(value);
+     });
+   };
+
   return   (<>
+    <div className="flex justify-end items-start gap-2">
+      <div className="relative">
+        <InputCustom
+          label=""
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="pl-8 pr-8 w-[200px]"
+        />
+      </div>
+    </div>
     <div className="flex justify-end">
       <NewInvite setIsOpen={setIsOpen} isOpen={isOpen}/>
     </div>
@@ -134,11 +162,11 @@ export interface IProps {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage((prev: number) => Math.max(prev - 1, 1))}
                 isActive={currentPage !== 1}
               />
             </PaginationItem>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            {Array.from({length: totalPages}, (_, i) => i + 1).map((page) => (
               <PaginationItem key={page}>
                 <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page}>
                   {page}
@@ -158,6 +186,6 @@ export interface IProps {
       <></>
     )}
   </>)
-}
+ }
 
 export default Invites;

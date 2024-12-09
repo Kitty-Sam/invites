@@ -1,26 +1,29 @@
-import type {FindInvites, FindInvitesVariables} from 'types/graphql'
-import {CellFailureProps, CellSuccessProps, TypedDocumentNode, useMutation,} from '@redwoodjs/web'
+import {useMutation, useQuery,} from '@redwoodjs/web'
 import Invites from "@/components/Invite/Invites/Invites";
 import {NewInvite} from "@/components/Invite/NewInvite/NewInvite";
 import React, {useState} from "react";
 import {EStatus} from "@/enums/invite-status.enum";
 
 
-export const QUERY: TypedDocumentNode<FindInvites, FindInvitesVariables> = gql`
-  query FindInvites {
-    invites {
-      id
-      email
-      companyName
-      firstName
-      lastName
-      jobTitle
-      inviteDuration
-      message
-      status
-      expiresIn
-      createdAt
-      updatedAt
+// Запрос на получение данных по странице
+export const QUERY = gql`
+  query FindInvites($page: Int, $pageSize: Int, $whereCondition: InviteFilterInput) {
+    invites(page: $page, pageSize: $pageSize, whereCondition: $whereCondition) {
+      invites {
+        id
+        email
+        companyName
+        firstName
+        lastName
+        jobTitle
+        inviteDuration
+        message
+        status
+        expiresIn
+        createdAt
+        updatedAt
+      }
+      totalItems
     }
   }
 `
@@ -57,13 +60,30 @@ export const Empty = () => {
   )
 }
 
-export const Failure = ({error}: CellFailureProps<FindInvites>) => (
-  <div className="rw-cell-error">{error?.message}</div>
+export const Failure = () => (
+  <div className="rw-cell-error">error</div>
 )
 
-export const Success = ({
-                          invites,
-                        }: CellSuccessProps<FindInvites, FindInvitesVariables>) => {
+export const Success = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const { data, loading, error } = useQuery(QUERY, {
+    variables: {
+      page: currentPage,
+      pageSize: 2,
+      whereCondition: { status: selectedStatus, lastName: searchQuery },
+    },
+  });
+
+
+  const { invites = [], totalItems = 0 } = data?.invites || {};
+
+
+  console.log('invites', invites)
+
+
   const [updateCurrentInvite, { loading: updating, error: updateError }] = useMutation(
     UPDATE_INVITE,
     {
@@ -106,6 +126,14 @@ export const Success = ({
   }
 
   return  <Invites invites={invites}
+                   totalItems={totalItems}
                    onUpdateInvite={handleUpdateInvite}
-                   onResendInvite={handleResendInvite}/>
+                   onResendInvite={handleResendInvite}
+                   setSelectedStatus={setSelectedStatus}
+                   selectedStatus={selectedStatus}
+                   setCurrentPage={setCurrentPage}
+                   currentPage={currentPage}
+                   searchQuery={searchQuery}
+                   setSearchQuery={setSearchQuery}
+  />
 }
