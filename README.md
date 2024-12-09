@@ -1,9 +1,12 @@
 # README
-Styles are temporary broken
+Styles are fixed
 
 Table
-![Screenshot 2024-12-06 at 18 03 12](https://github.com/user-attachments/assets/6c4bbdb9-9d5e-47a6-a8d4-46a6b5d81734)
+
+<img width="1354" alt="Screenshot 2024-12-09 at 01 05 16" src="https://github.com/user-attachments/assets/f0acca02-a746-4861-9d31-97f64cffc224">
+
 
 
 Dialog
-![Screenshot 2024-12-06 at 18 03 19](https://github.com/user-attachments/assets/a61ec55d-2594-45a3-b8b0-38f5cafed3f0)
+
+<img width="731" alt="Screenshot 2024-12-09 at 01 05 21" src="https://github.com/user-attachments/assets/c36075df-83e3-4bbc-924e-d958cb7e4020">
