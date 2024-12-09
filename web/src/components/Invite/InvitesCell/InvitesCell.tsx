@@ -1,5 +1,5 @@
 import {useMutation, useQuery,} from '@redwoodjs/web'
-import Invites from "@/components/Invite/Invites/Invites";
+import Invites, {ITEMS_PER_PAGE} from "@/components/Invite/Invites/Invites";
 import {NewInvite} from "@/components/Invite/NewInvite/NewInvite";
 import React, {useState} from "react";
 import {EStatus} from "@/enums/invite-status.enum";
@@ -27,12 +27,13 @@ export const QUERY = gql`
     }
   }
 `
+
+
 // Мутация для обновления статуса приглашения
 const UPDATE_INVITE = gql`
   mutation UpdateInviteMutation($id: Int!, $input: UpdateInviteInput!) {
     updateInvite(id: $id, input: $input) {
       id
-      status
     }
   }
 `
@@ -42,7 +43,6 @@ const RESEND_INVITE = gql`
   mutation ResendInviteMutation($id: Int!, $input: ResendInviteInput!) {
     resendInvite(id: $id, input: $input) {
       id
-      inviteDuration
     }
   }
 `
@@ -72,17 +72,13 @@ export const Success = () => {
   const { data, loading, error } = useQuery(QUERY, {
     variables: {
       page: currentPage,
-      pageSize: 2,
+      pageSize: ITEMS_PER_PAGE,
       whereCondition: { status: selectedStatus, lastName: searchQuery },
     },
   });
 
 
   const { invites = [], totalItems = 0 } = data?.invites || {};
-
-
-  console.log('invites', invites)
-
 
   const [updateCurrentInvite, { loading: updating, error: updateError }] = useMutation(
     UPDATE_INVITE,
@@ -103,6 +99,7 @@ export const Success = () => {
       },
     }
   )
+
 
   const handleResendInvite = (id: number, inviteDuration: number) => {
     resendCurrentInvite({

@@ -17,6 +17,9 @@ import {InputCustom} from "@/components/Invite/InputCustom/InputCustom";
 import {IInvite} from "src/interfaces/invite.interface";
 
 
+export const ITEMS_PER_PAGE = 5
+
+
 const statusColors = {
   active: 'bg-blue-500 hover:bg-blue-600',
   accepted: 'bg-green-500 hover:bg-green-600',
@@ -38,14 +41,12 @@ export interface IProps {
   totalItems: number
 }
 
- const Invites: FC<IProps> = ({invites, onResendInvite, onUpdateInvite, setSelectedStatus, selectedStatus, setCurrentPage, currentPage, searchQuery, setSearchQuery}) => {
-   // const [currentPage, setCurrentPage] = useState(1);
-  // const [selectedStatus, setSelectedStatus] = useState('all');
+ const Invites: FC<IProps> = ({invites, onResendInvite, onUpdateInvite, setSelectedStatus, selectedStatus, setCurrentPage, currentPage, searchQuery, setSearchQuery, totalItems}) => {
   const [isOpen, setIsOpen] = useState(false);
    const [_, startTransition] = useTransition();
 
 
-   const totalPages =  1;
+   const totalPages = totalItems ? Math.ceil(totalItems/ITEMS_PER_PAGE) : 1;
 
 
    const handleDeactivate =  (id: number) => {
@@ -77,7 +78,7 @@ export interface IProps {
       </div>
     </div>
     <div className="flex justify-end">
-      <NewInvite setIsOpen={setIsOpen} isOpen={isOpen}/>
+      <NewInvite setIsOpen={setIsOpen} isOpen={isOpen} />
     </div>
     <div className="flex justify-between items-center">
       <div className="inline-flex items-center bg-gray-100 rounded-lg gap-1 p-1">
@@ -118,7 +119,7 @@ export interface IProps {
               invites.map((invite) => (
                 <TableRow key={invite.id} className="h-20">
                   <TableCell>
-                    {invite.lastName} {invite.firstName} {invite.companyName}
+                   {invite.lastName} {invite.firstName} {invite.companyName}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -175,7 +176,7 @@ export interface IProps {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() => setCurrentPage((prev: number) => Math.min(prev + 1, totalPages))}
                 isActive={currentPage !== totalPages}
               />
             </PaginationItem>

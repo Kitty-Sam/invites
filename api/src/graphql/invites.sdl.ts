@@ -28,12 +28,12 @@ export const schema = gql`
     email: String!
     companyName: String!
     firstName: String!
-    lastName: String
     jobTitle: String!
     inviteDuration: Int!
-    message: String
     status: String!
     expiresIn: DateTime!
+    lastName: String
+    message: String
   }
 
   input UpdateInviteInput {

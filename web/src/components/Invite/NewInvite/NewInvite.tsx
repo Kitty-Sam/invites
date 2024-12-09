@@ -1,30 +1,42 @@
 import * as z from 'zod';
 import {FC} from "react";
-import type {CreateInviteMutation, CreateInviteMutationVariables,} from 'types/graphql'
-import {navigate, routes} from '@redwoodjs/router'
-import type {TypedDocumentNode} from '@redwoodjs/web'
-import {useMutation} from '@redwoodjs/web'
-import {toast} from '@redwoodjs/web/toast'
 import {SubmitHandler, useForm} from "@redwoodjs/forms";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {InputCustom} from "@/components/Invite/InputCustom/InputCustom";
 import {Button} from "@/components/ui/button";
-import {QUERY} from "@/components/Invite/InvitesCell/InvitesCell";
 import {durations} from "@/constants/invite-duration";
+import {EStatus} from "@/enums/invite-status.enum";
+import {QUERY} from "@/components/Invite/InvitesCell/InvitesCell";
+import {useMutation, useQuery} from "@redwoodjs/web";
+import {navigate, routes} from "@redwoodjs/router";
+import { useApolloClient } from '@apollo/client';
 
 
-const CREATE_INVITE_MUTATION: TypedDocumentNode<
-  CreateInviteMutation,
-  CreateInviteMutationVariables
-> = gql`
+
+//Добавление нового инвайта
+const CREATE_INVITE_MUTATION = gql`
   mutation CreateInviteMutation($input: CreateInviteInput!) {
     createInvite(input: $input) {
-      id
+        id
+        email
+        companyName
+        firstName
+        lastName
+        jobTitle
+        inviteDuration
+        message
+        status
+        expiresIn
+        createdAt
+        updatedAt
     }
   }
 `
+
+
+
 export interface IProps {
   setIsOpen: (value: boolean) => void;
   isOpen: boolean;
@@ -39,8 +51,7 @@ const formSchema = z.object({
     .string()
     .min(2, {
       message: 'Last name must be at least 2 characters.',
-    })
-    .optional(),
+    }),
   jobTitle: z.string().min(2, {
     message: 'Job Title must be at least 2 characters.',
   }),
@@ -71,24 +82,51 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const { refetch } = useQuery(QUERY, {
+    variables: {
+      page: 1,
+      pageSize: 10,
+      whereCondition: { status: 'all' },
+    },
+  });
+
+
+  const client = useApolloClient();
+
   const [createInvite, { loading, error }] = useMutation(
     CREATE_INVITE_MUTATION,
     {
-      refetchQueries: [{ query: QUERY }],
       onCompleted: () => {
-        toast.success('Invite created')
+        console.log('Invite created')
+        client.refetchQueries({
+          include: [QUERY],
+        });
         navigate(routes.invites())
       },
       onError: (error) => {
-        toast.error(error.message)
+        console.log('creation with error')
       },
     }
   )
 
+
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setIsOpen(false)
-    //@ts-ignore
-    createInvite({ variables: { input: {...data, status: EStatus.ACTIVE, inviteDuration: Number(data.inviteDuration),  expiresIn: new Date(new Date().getTime() + Number(data.inviteDuration) * 24 * 60 * 60 * 1000).toISOString() } } })
+
+    const duration =  data.inviteDuration ? Number(data.inviteDuration): 7
+
+    createInvite({
+      variables: { input: {
+          jobTitle: data.jobTitle,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          companyName: data.companyName,
+          status: EStatus.ACTIVE,
+          inviteDuration: data.inviteDuration ? Number(data.inviteDuration): 7,
+          expiresIn: new Date(new Date().getTime() + duration * 24 * 60 * 60 * 1000).toISOString() } } })
+
     reset();
 
   }
@@ -137,12 +175,12 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
                 id="firstName"
                 label="Name"
                 required
-                {...register('firstName', { required: 'First name  is required' })}
+                {...register('firstName', { required: 'First name is required' })}
               />
               {errors.firstName && <span className="text-red-500 text-sm">{errors.firstName.message}</span>}
             </div>
             <div className="grid gap-2">
-              <InputCustom id="lastName" label="Last Name" {...register('lastName')} />
+              <InputCustom id="lastName" required label="Last Name" {...register('lastName', { required: 'First name is required' })} />
               {errors.lastName && <span className="text-red-500 text-sm">{errors.lastName.message}</span>}
             </div>
           </div>
