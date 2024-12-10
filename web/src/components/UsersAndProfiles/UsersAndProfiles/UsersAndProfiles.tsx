@@ -69,6 +69,7 @@ const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
   const [isAddUser, setIsAddUser] = useState(false)
   const [isAddProfile, setIsAddProfile] = useState(false)
+  const [isEditUser, setIsEditUser] = useState(false)
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -103,12 +104,16 @@ const UsersAndProfiles = () => {
       </div>
 
       {activeTab === EUsersOrProfilesMode.USERS ? (
-        <UsersTable
-          users={paginatedData}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        <>
+          <UsersTable
+            users={paginatedData}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            isEditUser={isEditUser}
+            setIsEditUser={setIsEditUser}
+          />
+        </>
       ) : (
         <ProfilesTable
           profiles={paginatedData}

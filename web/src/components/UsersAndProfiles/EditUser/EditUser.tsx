@@ -3,28 +3,37 @@ import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import { IUser } from '@/interfaces/user.interface'
 
 export interface IProps {
   isOpen: boolean
   setIsOpen: (value: boolean) => void
+  user: IUser
 }
 
 const formSchema = z.object({
+  fullName: z.string().min(2, {
+    message: 'fullName should be at least 2 characters.',
+  }),
+  email: z.string().email({
+    message: 'Please enter a valid email address.',
+  }),
   goLoginId: z.string().min(2, {
     message: 'goLogin should be at least 2 characters.',
   }),
+  specializedProfiles: z.array(z.string()),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
+const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
   const {
     register,
     handleSubmit,
@@ -39,22 +48,26 @@ const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
     reset()
   }
 
+  const form = useForm<FormData>({
+    defaultValues: {
+      fullName: user?.name || '',
+      email: user?.email || '',
+      goLoginId: user?.goLoginId || '',
+      specializedProfiles: user?.specializedProfiles || [],
+    },
+  })
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">
-          <img src="/plus.png" alt="Add New User" className="h-5 w-5" />
-          <span>Add User</span>
-        </Button>
-      </DialogTrigger>
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl">Add User</DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription className="text-sm text-muted-foreground">
             Here you can add Upwork users
-          </p>
+          </DialogDescription>
         </DialogHeader>
         <form
+          {...form}
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
           autoComplete="off"
@@ -62,12 +75,44 @@ const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
           <div className="grid grid-cols-1 gap-4">
             <div className="grid gap-2">
               <InputCustom
+                id="fullName"
+                type="text"
+                label="User Name"
+                required
+                {...register('fullName', {
+                  required: 'Full Name is required',
+                })}
+              />
+              {errors.fullName && (
+                <span className="text-sm text-red-500">
+                  {errors.fullName.message}
+                </span>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <InputCustom
+                id="email"
+                type="email"
+                label="E-mail"
+                required
+                {...register('email', {
+                  required: 'E-mail is required',
+                })}
+              />
+              {errors.email && (
+                <span className="text-sm text-red-500">
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <InputCustom
                 id="goLoginId"
                 type="text"
                 label="Gologin ID"
                 required
                 {...register('goLoginId', {
-                  required: 'Gologin ID is required',
+                  required: 'GoLoginId is required',
                 })}
               />
               {errors.goLoginId && (
@@ -88,4 +133,4 @@ const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
   )
 }
 
-export default NewUser
+export default EditUser

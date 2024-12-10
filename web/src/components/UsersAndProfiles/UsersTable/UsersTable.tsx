@@ -12,12 +12,16 @@ import { Edit, Share, Trash2 } from 'lucide-react'
 import { IUser } from '@/interfaces/user.interface'
 import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
+import EditUser from '@/components/UsersAndProfiles/EditUser/EditUser'
 
 interface IProps {
   users: IUser[] | IProfile[]
   currentPage: number
   totalPages: number
   onPageChange: any
+
+  isEditUser: boolean
+  setIsEditUser: any
 }
 
 export const UsersTable: FC<IProps> = ({
@@ -25,6 +29,8 @@ export const UsersTable: FC<IProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  setIsEditUser,
+  isEditUser,
 }) => {
   return (
     <>
@@ -77,10 +83,19 @@ export const UsersTable: FC<IProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
+                        onClick={() => setIsEditUser(user)}
                       >
                         <Edit className="h-4 w-4" />
                         Edit
                       </Button>
+
+                      {isEditUser && (
+                        <EditUser
+                          isOpen={isEditUser}
+                          setIsOpen={setIsEditUser}
+                          user={user}
+                        />
+                      )}
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />
                       </Button>
