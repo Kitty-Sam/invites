@@ -1,57 +1,62 @@
-import * as z from 'zod';
-import {FC} from "react";
-import {SubmitHandler, useForm} from "@redwoodjs/forms";
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Textarea} from "@/components/ui/textarea";
-import {InputCustom} from "@/components/Invite/InputCustom/InputCustom";
-import {Button} from "@/components/ui/button";
-import {durations} from "@/constants/invite-duration";
-import {EStatus} from "@/enums/invite-status.enum";
-import {QUERY} from "@/components/Invite/InvitesCell/InvitesCell";
-import {useMutation, useQuery} from "@redwoodjs/web";
-import {navigate, routes} from "@redwoodjs/router";
-import { useApolloClient } from '@apollo/client';
-
-
+import * as z from 'zod'
+import { FC } from 'react'
+import { SubmitHandler, useForm } from '@redwoodjs/forms'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { durations } from '@/constants/invite-duration'
+import { EStatus } from '@/enums/invite-status.enum'
+import { useMutation, useQuery } from '@redwoodjs/web'
+import { navigate, routes } from '@redwoodjs/router'
+import { useApolloClient } from '@apollo/client'
+import { QUERY } from '@/components/Invite/InvitesCell/InvitesCell'
+import { InputCustom } from '@/components/shared/input-custom/input-custom'
 
 //Добавление нового инвайта
 const CREATE_INVITE_MUTATION = gql`
   mutation CreateInviteMutation($input: CreateInviteInput!) {
     createInvite(input: $input) {
-        id
-        email
-        companyName
-        firstName
-        lastName
-        jobTitle
-        inviteDuration
-        message
-        status
-        expiresIn
-        createdAt
-        updatedAt
+      id
+      email
+      companyName
+      firstName
+      lastName
+      jobTitle
+      inviteDuration
+      message
+      status
+      expiresIn
+      createdAt
+      updatedAt
     }
   }
 `
 
-
-
 export interface IProps {
-  setIsOpen: (value: boolean) => void;
-  isOpen: boolean;
+  setIsOpen: (value: boolean) => void
+  isOpen: boolean
 }
-
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
     message: 'First name must be at least 2 characters.',
   }),
-  lastName: z
-    .string()
-    .min(2, {
-      message: 'Last name must be at least 2 characters.',
-    }),
+  lastName: z.string().min(2, {
+    message: 'Last name must be at least 2 characters.',
+  }),
   jobTitle: z.string().min(2, {
     message: 'Job Title must be at least 2 characters.',
   }),
@@ -67,31 +72,23 @@ const formSchema = z.object({
       message: 'Company name is required.',
     })
     .optional(),
-  inviteDuration: z.number().min(3, { message: 'Duration is 7 days by default' }),
-});
+  inviteDuration: z
+    .number()
+    .min(3, { message: 'Duration is 7 days by default' }),
+})
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof formSchema>
 
-
-export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
+export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>()
 
-  const { refetch } = useQuery(QUERY, {
-    variables: {
-      page: 1,
-      pageSize: 10,
-      whereCondition: { status: 'all' },
-    },
-  });
-
-
-  const client = useApolloClient();
+  const client = useApolloClient()
 
   const [createInvite, { loading, error }] = useMutation(
     CREATE_INVITE_MUTATION,
@@ -100,7 +97,7 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
         console.log('Invite created')
         client.refetchQueries({
           include: [QUERY],
-        });
+        })
         navigate(routes.invites())
       },
       onError: (error) => {
@@ -109,45 +106,55 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
     }
   )
 
-
-
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setIsOpen(false)
 
-    const duration =  data.inviteDuration ? Number(data.inviteDuration): 7
+    const duration = data.inviteDuration ? Number(data.inviteDuration) : 7
 
     createInvite({
-      variables: { input: {
+      variables: {
+        input: {
           jobTitle: data.jobTitle,
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
           companyName: data.companyName,
           status: EStatus.ACTIVE,
-          inviteDuration: data.inviteDuration ? Number(data.inviteDuration): 7,
-          expiresIn: new Date(new Date().getTime() + duration * 24 * 60 * 60 * 1000).toISOString() } } })
+          inviteDuration: data.inviteDuration ? Number(data.inviteDuration) : 7,
+          expiresIn: new Date(
+            new Date().getTime() + duration * 24 * 60 * 60 * 1000
+          ).toISOString(),
+        },
+      },
+    })
 
-    reset();
-
+    reset()
   }
 
   const onInviteDurationChange = (value: string) => {
-    setValue('inviteDuration', Number(value));
-  };
+    setValue('inviteDuration', Number(value))
+  }
 
-
-  return (<Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-500 hover:bg-blue-600">
+          <img src="/plus.png" alt="Add New Invite" className="h-5 w-5" />
           <span>New Invite</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] bg-white">
+      <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl">New Invitation</DialogTitle>
-          <p className="text-sm text-muted-foreground">Detailed information about you</p>
+          <p className="text-sm text-muted-foreground">
+            Detailed information about you
+          </p>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          autoComplete="off"
+        >
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <InputCustom
@@ -157,16 +164,26 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
                 required
                 {...register('email', { required: 'Email is required' })}
               />
-              {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+              {errors.email && (
+                <span className="text-sm text-red-500">
+                  {errors.email.message}
+                </span>
+              )}
             </div>
             <div className="grid gap-2">
               <InputCustom
                 id="companyName"
                 label="Company Name"
                 required
-                {...register('companyName', { required: 'Company name is required' })}
+                {...register('companyName', {
+                  required: 'Company name is required',
+                })}
               />
-              {errors.companyName && <span className="text-red-500 text-sm">{errors.companyName.message}</span>}
+              {errors.companyName && (
+                <span className="text-sm text-red-500">
+                  {errors.companyName.message}
+                </span>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -175,13 +192,30 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
                 id="firstName"
                 label="Name"
                 required
-                {...register('firstName', { required: 'First name is required' })}
+                {...register('firstName', {
+                  required: 'First name is required',
+                })}
               />
-              {errors.firstName && <span className="text-red-500 text-sm">{errors.firstName.message}</span>}
+              {errors.firstName && (
+                <span className="text-sm text-red-500">
+                  {errors.firstName.message}
+                </span>
+              )}
             </div>
             <div className="grid gap-2">
-              <InputCustom id="lastName" required label="Last Name" {...register('lastName', { required: 'First name is required' })} />
-              {errors.lastName && <span className="text-red-500 text-sm">{errors.lastName.message}</span>}
+              <InputCustom
+                id="lastName"
+                required
+                label="Last Name"
+                {...register('lastName', {
+                  required: 'First name is required',
+                })}
+              />
+              {errors.lastName && (
+                <span className="text-sm text-red-500">
+                  {errors.lastName.message}
+                </span>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -189,16 +223,29 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
               <InputCustom
                 id="jobTitle"
                 label="Job Title"
-                {...register('jobTitle', { required: 'First name  is required' })}
+                {...register('jobTitle', {
+                  required: 'First name  is required',
+                })}
                 required
               />
-              {errors.jobTitle && <span className="text-red-500 text-sm">{errors.jobTitle.message}</span>}
+              {errors.jobTitle && (
+                <span className="text-sm text-red-500">
+                  {errors.jobTitle.message}
+                </span>
+              )}
             </div>
             <div className="space-y-1">
-              <label htmlFor="inviteDuration" className="block text-sm font-medium">
+              <label
+                htmlFor="inviteDuration"
+                className="block text-sm font-medium"
+              >
                 Invite Duration
               </label>
-              <Select onValueChange={onInviteDurationChange} required defaultValue={'7'}>
+              <Select
+                onValueChange={onInviteDurationChange}
+                required
+                defaultValue={'7'}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select duration" />
                 </SelectTrigger>
@@ -226,18 +273,18 @@ export const NewInvite : FC<IProps> = ({ setIsOpen, isOpen }) => {
               type="button"
               variant="outline"
               onClick={() => {
-                reset();
+                reset()
               }}
             >
               Discard
             </Button>
             <Button className="bg-blue-500 hover:bg-blue-600">
+              <img src="/send.png" alt="Send" className="h-5 w-5" />
               <span>Send Invite</span>
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
-

@@ -1,20 +1,16 @@
-import { Metadata } from '@redwoodjs/web'
+import { OnboardingForm } from '@/components/Onboarding/OnboardingForm/OnboardingForm'
 
 const OnboardingPage = () => {
   return (
-    <>
-      <Metadata title="Onboarding" description="Onboarding page" />
+    <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background">
+      <div className="fixed left-0 top-0 w-full py-2 text-center text-black shadow-md">
+        <p className="text-[14px] font-bold leading-[20px]">BenchExchange</p>
+      </div>
 
-      <h1>OnboardingPage</h1>
-      <p>
-        Find me in{' '}
-        <code>./web/src/pages/OnboardingPage/OnboardingPage.tsx</code>
-      </p>
-      {/*
-          My default route is named `onboarding`, link to me with:
-          `<Link to={routes.onboarding()}>Onboarding</Link>`
-      */}
-    </>
+      <div className="flex flex-grow flex-col items-center justify-center bg-gray-50 p-4">
+        <OnboardingForm />
+      </div>
+    </div>
   )
 }
 
