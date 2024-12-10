@@ -19,7 +19,7 @@ model Invite {
   email          String   @unique
   companyName    String
   firstName      String
-  lastName       String?
+  lastName       String
   jobTitle       String
   inviteDuration Int
   message        String?

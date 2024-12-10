@@ -1,6 +1,6 @@
 export enum EStatus {
-  ACTIVE = 'active',
-  ACCEPTED = 'accepted',
-  EXPIRED = 'expired',
-  DEACTIVATED = 'deactivated',
+  ACTIVE = 'Active',
+  ACCEPTED = 'Accepted',
+  EXPIRED = 'Expired',
+  DEACTIVATED = 'Deactivated',
 }

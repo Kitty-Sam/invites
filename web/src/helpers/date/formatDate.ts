@@ -1,6 +1,5 @@
-
-export const formatDate = (dateString: Date| string) => {
-  const date = new Date(dateString);
+export const formatDate = (dateString: Date | string) => {
+  const date = new Date(dateString)
   return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -8,5 +7,5 @@ export const formatDate = (dateString: Date| string) => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-  });
-};
+  })
+}
