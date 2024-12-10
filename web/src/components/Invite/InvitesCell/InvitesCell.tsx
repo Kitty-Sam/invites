@@ -66,7 +66,7 @@ export const Failure = () => <div className="rw-cell-error">error</div>
 
 export const Success = () => {
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data, loading, error } = useQuery(QUERY, {

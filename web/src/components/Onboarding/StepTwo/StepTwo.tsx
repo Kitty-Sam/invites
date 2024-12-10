@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/select'
 import { OnboardingStepProps } from '@/types/onboarding'
 import { companySizes } from '@/constants/company-size'
-import { InputCustom } from '@/components/shared/input-custom/input-custom'
 import { StepIndicator } from '@/components/Onboarding/StepIndicator/StepIndicator'
+import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 
 export const StepTwo = ({
   data,

@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OnboardingStepProps } from '@/types/onboarding'
 import React from 'react'
-import { InputCustom } from '@/components/shared/input-custom/input-custom'
 import { StepIndicator } from '@/components/Onboarding/StepIndicator/StepIndicator'
+import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 
 export function StepOne({
   data,

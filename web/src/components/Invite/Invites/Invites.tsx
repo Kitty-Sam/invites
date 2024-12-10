@@ -9,27 +9,22 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
 import { EStatus } from '@/enums/invite-status.enum'
 import { formatDate } from '@/helpers/date/formatDate'
 import { IInvite } from 'src/interfaces/invite.interface'
-import { InputCustom } from '@/components/shared/input-custom/input-custom'
+
 import { NewInvite } from '@/components/Invite/NewInvite/NewInvite'
+import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
+import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
 
 export const ITEMS_PER_PAGE = 5
 
 const statusColors = {
-  active: 'bg-blue-500 hover:bg-blue-600',
-  accepted: 'bg-green-500 hover:bg-green-600',
-  expired: 'bg-yellow-500 hover:bg-yellow-600',
-  deactivated: 'bg-red-500 hover:bg-red-600',
+  Active: 'bg-blue-500 hover:bg-blue-600',
+  Accepted: 'bg-green-500 hover:bg-green-600',
+  Expired: 'bg-yellow-500 hover:bg-yellow-600',
+  Deactivated: 'bg-red-500 hover:bg-red-600',
 }
 
 export interface IProps {
@@ -92,30 +87,15 @@ const Invites: FC<IProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <TabNavigationCustom
+          tabs={['All', EStatus.ACTIVE, EStatus.DEACTIVATED, EStatus.EXPIRED]}
+          activeTab={selectedStatus}
+          onTabChange={(tab) => {
+            setSelectedStatus(tab)
+          }}
+        />
         <NewInvite setIsOpen={setIsOpen} isOpen={isOpen} />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="mb-4 inline-flex items-center gap-1 rounded-lg bg-gray-100 p-1">
-          {['all', EStatus.ACTIVE, EStatus.DEACTIVATED, EStatus.EXPIRED].map(
-            (status) => (
-              <button
-                key={status}
-                onClick={() => setSelectedStatus(status)}
-                className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
-                  selectedStatus === status
-                    ? 'bg-white font-medium text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {status === 'all'
-                  ? 'All'
-                  : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            )
-          )}
-        </div>
       </div>
 
       <div className="rounded-lg border">
@@ -182,42 +162,11 @@ const Invites: FC<IProps> = ({
         </div>
       </div>
       {totalPages ? (
-        <div className="space-y-4 bg-gray-100 p-4">
-          <Pagination className="flex justify-end">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev: number) => Math.max(prev - 1, 1))
-                  }
-                  isActive={currentPage !== 1}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                )
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prev: number) =>
-                      Math.min(prev + 1, totalPages)
-                    )
-                  }
-                  isActive={currentPage !== totalPages}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        <PaginationCustom
+          onPageChange={setCurrentPage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       ) : (
         <></>
       )}

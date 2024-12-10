@@ -19,11 +19,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { durations } from '@/constants/invite-duration'
 import { EStatus } from '@/enums/invite-status.enum'
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { useMutation } from '@redwoodjs/web'
 import { navigate, routes } from '@redwoodjs/router'
 import { useApolloClient } from '@apollo/client'
 import { QUERY } from '@/components/Invite/InvitesCell/InvitesCell'
-import { InputCustom } from '@/components/shared/input-custom/input-custom'
+import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 
 //Добавление нового инвайта
 const CREATE_INVITE_MUTATION = gql`

@@ -4,24 +4,27 @@ import { db } from 'src/lib/db'
 
 const ITEMS_PER_PAGE = 5
 
-export const invites: QueryResolvers['invites'] = async ({page = 1, pageSize = ITEMS_PER_PAGE, whereCondition = {status: 'all', lastName: ''}}) => {
-  const skip = (page - 1) * pageSize;
+export const invites: QueryResolvers['invites'] = async ({
+  page = 1,
+  pageSize = ITEMS_PER_PAGE,
+  whereCondition = { status: 'All', lastName: '' },
+}) => {
+  const skip = (page - 1) * pageSize
 
-  const statusCondition = whereCondition.status !== 'all' ? {status: whereCondition.status }: {};
+  const statusCondition =
+    whereCondition.status !== 'All' ? { status: whereCondition.status } : {}
 
   const nameCondition =
     whereCondition.lastName !== ''
-    ? {
-        lastName: {startsWith: whereCondition.lastName},
-    }
-    : {};
-
+      ? {
+          lastName: { startsWith: whereCondition.lastName },
+        }
+      : {}
 
   const combinedWhereCondition = {
     ...statusCondition,
     ...nameCondition,
-  };
-
+  }
 
   const [invites, totalItems] = await Promise.all([
     db.invite.findMany({
@@ -30,22 +33,22 @@ export const invites: QueryResolvers['invites'] = async ({page = 1, pageSize = I
       take: pageSize,
       orderBy: {
         createdAt: 'desc',
-      }
+      },
     }),
     db.invite.count({
       where: combinedWhereCondition,
     }),
-  ]);
+  ])
 
   return {
     invites,
     totalItems,
-  };
-};
+  }
+}
 
 export const createInvite: MutationResolvers['createInvite'] = ({ input }) => {
   return db.invite.create({
-    data: {...input, createdAt: new Date().toISOString()},
+    data: { ...input, createdAt: new Date().toISOString() },
   })
 }
 
@@ -59,17 +62,21 @@ export const updateInvite: MutationResolvers['updateInvite'] = ({
   })
 }
 
-export const resendInvite: MutationResolvers['resendInvite'] = ({ id, input }) => {
+export const resendInvite: MutationResolvers['resendInvite'] = ({
+  id,
+  input,
+}) => {
   return db.invite.update({
     where: { id },
     data: {
-      status: 'active',
-      expiresIn: new Date(new Date().getTime() + input.inviteDuration * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'Active',
+      expiresIn: new Date(
+        new Date().getTime() + input.inviteDuration * 24 * 60 * 60 * 1000
+      ).toISOString(),
       createdAt: new Date().toISOString(),
     },
   })
 }
-
 
 export const deleteInvite: MutationResolvers['deleteInvite'] = ({ id }) => {
   return db.invite.delete({
