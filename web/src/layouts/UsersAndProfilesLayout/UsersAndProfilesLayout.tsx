@@ -8,7 +8,7 @@ export interface IProps {
 
 export const UsersAndProfilesLayout: FC<IProps> = ({ children }) => {
   return (
-    <div className="relative flex min-h-screen flex-col">
+    <div className="relative mx-auto flex  min-h-screen  flex-col">
       <Header />
       <main className="flex-1 bg-muted/40 px-10 pt-10">{children}</main>
       <Footer />

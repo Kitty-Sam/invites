@@ -10,9 +10,11 @@ import { IUser } from '@/interfaces/user.interface'
 import { Button } from '@/components/ui/button'
 import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
 import { useAppDispatch, useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentPageType } from '@/store/selectors'
 import { ModalsType, showModal } from '@/store/reducers/modalReducer'
 import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
+import { EditProfile } from '@/components/UsersAndProfiles/EditProfile/EditProfile'
+import { PageType } from '@/store/reducers/pageReducer'
 
 const ITEMS_PER_PAGE = 5
 
@@ -74,8 +76,11 @@ const profiles = [
 const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
   const [currentPage, setCurrentPage] = useState(1)
+  const [currentProfile, setCurrentProfile] = useState<IProfile | null>(null)
 
   const modalType = useAppSelector(getCurrentModalType)
+  const pageType = useAppSelector(getCurrentPageType)
+
   const dispatch = useAppDispatch()
 
   const currentData =
@@ -91,67 +96,78 @@ const UsersAndProfiles = () => {
 
   return (
     <UsersAndProfilesLayout>
-      <div className="flex justify-between">
-        <TabNavigationCustom
-          tabs={[EUsersOrProfilesMode.USERS, EUsersOrProfilesMode.PROFILES]}
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab)
-            setCurrentPage(1)
-          }}
-        />
+      {pageType === PageType.EDIT_UPWORK_PROFILE ? (
+        <EditProfile profile={currentProfile} />
+      ) : (
+        <>
+          <div className="flex justify-between">
+            <TabNavigationCustom
+              tabs={[EUsersOrProfilesMode.USERS, EUsersOrProfilesMode.PROFILES]}
+              activeTab={activeTab}
+              onTabChange={(tab) => {
+                setActiveTab(tab)
+                setCurrentPage(1)
+              }}
+            />
 
-        {activeTab === EUsersOrProfilesMode.USERS ? (
-          modalType === ModalsType.ADD_UPWORK_USER ? (
-            <>
+            {activeTab === EUsersOrProfilesMode.USERS ? (
+              modalType === ModalsType.ADD_UPWORK_USER ? (
+                <>
+                  <ButtonWithIconCustom
+                    onClick={() => {}}
+                    title={'Add User'}
+                    src={'/plus.png'}
+                  />
+                  <NewUser />
+                </>
+              ) : (
+                <ButtonWithIconCustom
+                  onClick={() =>
+                    dispatch(showModal(ModalsType.ADD_UPWORK_USER))
+                  }
+                  title={'Add User'}
+                  src={'/plus.png'}
+                />
+              )
+            ) : modalType === ModalsType.ADD_UPWORK_PROFILE ? (
+              <>
+                <ButtonWithIconCustom
+                  onClick={() => {}}
+                  title={'Add Profile'}
+                  src={'/plus.png'}
+                />
+                <NewProfile />
+              </>
+            ) : (
               <ButtonWithIconCustom
-                onClick={() => {}}
-                title={'Add User'}
+                onClick={() =>
+                  dispatch(showModal(ModalsType.ADD_UPWORK_PROFILE))
+                }
+                title={'Add Profile'}
                 src={'/plus.png'}
               />
-              <NewUser />
+            )}
+          </div>
+
+          {activeTab === EUsersOrProfilesMode.USERS ? (
+            <>
+              <UsersTable
+                users={paginatedData}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </>
           ) : (
-            <ButtonWithIconCustom
-              onClick={() => dispatch(showModal(ModalsType.ADD_UPWORK_USER))}
-              title={'Add User'}
-              src={'/plus.png'}
+            <ProfilesTable
+              profiles={paginatedData}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              setCurrentProfile={setCurrentProfile}
             />
-          )
-        ) : modalType === ModalsType.ADD_UPWORK_PROFILE ? (
-          <>
-            <ButtonWithIconCustom
-              onClick={() => {}}
-              title={'Add Profile'}
-              src={'/plus.png'}
-            />
-            <NewProfile />
-          </>
-        ) : (
-          <ButtonWithIconCustom
-            onClick={() => dispatch(showModal(ModalsType.ADD_UPWORK_PROFILE))}
-            title={'Add Profile'}
-            src={'/plus.png'}
-          />
-        )}
-      </div>
-
-      {activeTab === EUsersOrProfilesMode.USERS ? (
-        <>
-          <UsersTable
-            users={paginatedData}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          )}
         </>
-      ) : (
-        <ProfilesTable
-          profiles={paginatedData}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
       )}
     </UsersAndProfilesLayout>
   )
