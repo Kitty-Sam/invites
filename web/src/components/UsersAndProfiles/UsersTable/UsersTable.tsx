@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -12,7 +12,7 @@ import { Edit, Share, Trash2 } from 'lucide-react'
 import { IUser } from '@/interfaces/user.interface'
 import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
-import EditUser from '@/components/UsersAndProfiles/EditUser/EditUser'
+import { EditUser } from '@/components/UsersAndProfiles/EditUser/EditUser'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { ModalsType, showModal } from '@/store/reducers/modalReducer'
@@ -32,6 +32,8 @@ export const UsersTable: FC<IProps> = ({
 }) => {
   const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useAppDispatch()
+
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null)
 
   return (
     <>
@@ -68,7 +70,7 @@ export const UsersTable: FC<IProps> = ({
                   <TableCell>{user.goLoginId}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.specializedProfiles.map(
+                      {user.specialties.map(
                         (profile: string, index: number) => (
                           <span
                             key={index}
@@ -86,16 +88,17 @@ export const UsersTable: FC<IProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
-                        onClick={() =>
+                        onClick={() => {
                           dispatch(showModal(ModalsType.EDIT_UPWORK_USER))
-                        }
+                          setCurrentUser(user)
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                         Edit
                       </Button>
 
                       {modalType === ModalsType.EDIT_UPWORK_USER && (
-                        <EditUser user={user} />
+                        <EditUser user={currentUser} />
                       )}
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />

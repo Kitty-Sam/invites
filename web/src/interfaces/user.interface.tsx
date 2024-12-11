@@ -3,5 +3,5 @@ export interface IUser {
   name: string
   email: string
   goLoginId: string
-  specializedProfiles: string[]
+  specialties: string[]
 }

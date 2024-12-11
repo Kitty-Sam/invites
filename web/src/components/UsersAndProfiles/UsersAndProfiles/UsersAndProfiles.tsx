@@ -23,28 +23,28 @@ const users = [
     name: 'Stephanie Sharkey',
     email: 'steph55@gmail.com',
     goLoginId: 'fadsfhsa66×719x',
-    specializedProfiles: ['Web Design', 'UX design', 'Frontend development'],
+    specialties: ['Web Design', 'UX design', 'Frontend development'],
   },
   {
     id: '2',
     name: 'Joshua Jones',
     email: 'j.jones@aol.com',
     goLoginId: 'kjlkf43u345h',
-    specializedProfiles: ['Machine Learning'],
+    specialties: ['Machine Learning'],
   },
   {
     id: '3',
     name: 'Rhonda Rhodes',
     email: 'r.rhodes@outlook.com',
     goLoginId: 'fjsdbfbqjwt',
-    specializedProfiles: ['Product Management', 'Marketing Strategy'],
+    specialties: ['Product Management', 'Marketing Strategy'],
   },
   {
     id: '4',
     name: 'James Hall',
     email: 'j.hall367@outlook.com',
     goLoginId: 'gkmgotmoboteo17132',
-    specializedProfiles: ['3D Animation'],
+    specialties: ['3D Animation'],
   },
 ] as IUser[]
 

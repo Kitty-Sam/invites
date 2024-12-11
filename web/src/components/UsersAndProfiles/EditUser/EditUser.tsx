@@ -1,8 +1,7 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import * as z from 'zod'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -16,6 +15,15 @@ import { useDispatch } from 'react-redux'
 import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { X } from 'lucide-react'
 
 export interface IProps {
   user: IUser
@@ -31,27 +39,68 @@ const formSchema = z.object({
   goLoginId: z.string().min(2, {
     message: 'goLogin should be at least 2 characters.',
   }),
-  specializedProfiles: z.array(z.string()),
+  specialties: z.array(z.string()),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-const EditUser: FC<IProps> = ({ user }) => {
+const AVAILABLE_SPECIALTIES = [
+  'Web Design',
+  'UX design',
+  'Frontend development',
+  'Machine Learning',
+  'Product Management',
+  'Marketing Strategy',
+  '3D Animation',
+  'Lead generation',
+]
+
+export const EditUser: FC<IProps> = ({ user }) => {
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
-  } = useForm<FormData>()
+  } = useForm<FormData>({
+    defaultValues: {
+      fullName: user?.name || '',
+      email: user?.email || '',
+      goLoginId: user?.goLoginId || '',
+      specialties: user?.specialties || [],
+    },
+  })
+
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('')
+  const [userSpecialties, setUserSpecialties] = useState<string[]>(
+    user?.specialties
+  )
 
   const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useDispatch()
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log('data', data)
-    dispatch(closeModal())
+    // dispatch(closeModal())
     reset()
+  }
+
+  useEffect(() => {
+    setValue('specialties', user?.specialties)
+  }, [user])
+
+  const addSpecialty = () => {
+    if (selectedSpecialty && !userSpecialties.includes(selectedSpecialty)) {
+      setValue('specialties', [...userSpecialties, selectedSpecialty])
+      setUserSpecialties([...userSpecialties, selectedSpecialty])
+      setSelectedSpecialty('')
+    }
+  }
+
+  const removeSpecialty = (specialty: string) => {
+    const updatedSpecialties = userSpecialties.filter((s) => s !== specialty)
+    setValue('specialties', updatedSpecialties)
+    setUserSpecialties(updatedSpecialties)
   }
 
   return (
@@ -124,6 +173,62 @@ const EditUser: FC<IProps> = ({ user }) => {
               )}
             </div>
           </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Specialized profiles</label>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {userSpecialties.map((profile) => (
+                  <Badge
+                    key={profile}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {profile}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 p-0 hover:bg-transparent"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeSpecialty(profile)
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Select
+                  value={selectedSpecialty}
+                  onValueChange={setSelectedSpecialty}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a specialty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AVAILABLE_SPECIALTIES.filter(
+                      (specialty) =>
+                        !getValues('specialties').includes(specialty)
+                    ).map((specialty) => (
+                      <SelectItem key={specialty} value={specialty}>
+                        {specialty}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={addSpecialty}
+                  disabled={!selectedSpecialty}
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
           <div className="flex justify-end">
             <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
               <span>Save</span>
@@ -134,5 +239,3 @@ const EditUser: FC<IProps> = ({ user }) => {
     </Dialog>
   )
 }
-
-export default EditUser
