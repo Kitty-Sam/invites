@@ -3,18 +3,19 @@ import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import { useDispatch } from 'react-redux'
+import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
+import { useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
 
-export interface IProps {
-  isOpen: boolean
-  setIsOpen: (value: boolean) => void
-}
+export interface IProps {}
 
 const formSchema = z.object({
   goLoginId: z.string().min(2, {
@@ -24,7 +25,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
+const NewUser: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -33,26 +34,26 @@ const NewUser: FC<IProps> = ({ isOpen, setIsOpen }) => {
     formState: { errors },
   } = useForm<FormData>()
 
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useDispatch()
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log('data', data)
-    setIsOpen(false)
+    dispatch(closeModal())
     reset()
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">
-          <img src="/plus.png" alt="Add New User" className="h-5 w-5" />
-          <span>Add User</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={modalType === ModalsType.ADD_UPWORK_USER}
+      onOpenChange={() => dispatch(closeModal())}
+    >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl">Add User</DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription className="text-sm text-muted-foreground">
             Here you can add Upwork users
-          </p>
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}

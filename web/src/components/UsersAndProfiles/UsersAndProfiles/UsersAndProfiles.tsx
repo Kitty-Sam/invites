@@ -7,6 +7,12 @@ import NewProfile from '@/components/UsersAndProfiles/NewProfile/NewProfile'
 import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
 import { IUser } from '@/interfaces/user.interface'
+import { Button } from '@/components/ui/button'
+import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
+import { ModalsType, showModal } from '@/store/reducers/modalReducer'
+import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
 
 const ITEMS_PER_PAGE = 5
 
@@ -67,11 +73,10 @@ const profiles = [
 
 const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
-  const [isAddUser, setIsAddUser] = useState(false)
-  const [isAddProfile, setIsAddProfile] = useState(false)
-  const [isEditUser, setIsEditUser] = useState(false)
-
   const [currentPage, setCurrentPage] = useState(1)
+
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useAppDispatch()
 
   const currentData =
     activeTab === EUsersOrProfilesMode.USERS ? users : profiles
@@ -85,7 +90,7 @@ const UsersAndProfiles = () => {
   )
 
   return (
-    <>
+    <UsersAndProfilesLayout>
       <div className="flex justify-between">
         <TabNavigationCustom
           tabs={[EUsersOrProfilesMode.USERS, EUsersOrProfilesMode.PROFILES]}
@@ -97,9 +102,37 @@ const UsersAndProfiles = () => {
         />
 
         {activeTab === EUsersOrProfilesMode.USERS ? (
-          <NewUser setIsOpen={setIsAddUser} isOpen={isAddUser} />
+          modalType === ModalsType.ADD_UPWORK_USER ? (
+            <>
+              <ButtonWithIconCustom
+                onClick={() => {}}
+                title={'Add User'}
+                src={'/plus.png'}
+              />
+              <NewUser />
+            </>
+          ) : (
+            <ButtonWithIconCustom
+              onClick={() => dispatch(showModal(ModalsType.ADD_UPWORK_USER))}
+              title={'Add User'}
+              src={'/plus.png'}
+            />
+          )
+        ) : modalType === ModalsType.ADD_UPWORK_PROFILE ? (
+          <>
+            <ButtonWithIconCustom
+              onClick={() => {}}
+              title={'Add Profile'}
+              src={'/plus.png'}
+            />
+            <NewProfile />
+          </>
         ) : (
-          <NewProfile setIsOpen={setIsAddProfile} isOpen={isAddProfile} />
+          <ButtonWithIconCustom
+            onClick={() => dispatch(showModal(ModalsType.ADD_UPWORK_PROFILE))}
+            title={'Add Profile'}
+            src={'/plus.png'}
+          />
         )}
       </div>
 
@@ -110,8 +143,6 @@ const UsersAndProfiles = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
-            isEditUser={isEditUser}
-            setIsEditUser={setIsEditUser}
           />
         </>
       ) : (
@@ -122,7 +153,7 @@ const UsersAndProfiles = () => {
           onPageChange={setCurrentPage}
         />
       )}
-    </>
+    </UsersAndProfilesLayout>
   )
 }
 

@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import * as z from 'zod'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -11,10 +12,12 @@ import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { IUser } from '@/interfaces/user.interface'
+import { useDispatch } from 'react-redux'
+import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
+import { useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
 
 export interface IProps {
-  isOpen: boolean
-  setIsOpen: (value: boolean) => void
   user: IUser
 }
 
@@ -33,7 +36,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
+const EditUser: FC<IProps> = ({ user }) => {
   const {
     register,
     handleSubmit,
@@ -42,32 +45,28 @@ const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
     formState: { errors },
   } = useForm<FormData>()
 
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useDispatch()
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log('data', data)
-    setIsOpen(false)
+    dispatch(closeModal())
     reset()
   }
 
-  const form = useForm<FormData>({
-    defaultValues: {
-      fullName: user?.name || '',
-      email: user?.email || '',
-      goLoginId: user?.goLoginId || '',
-      specializedProfiles: user?.specializedProfiles || [],
-    },
-  })
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={modalType === ModalsType.EDIT_UPWORK_USER}
+      onOpenChange={() => dispatch(closeModal())}
+    >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add User</DialogTitle>
+          <DialogTitle className="text-xl">Edit User</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Here you can add Upwork users
+            Here you can edit Upwork user
           </DialogDescription>
         </DialogHeader>
         <form
-          {...form}
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
           autoComplete="off"
@@ -82,6 +81,7 @@ const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
                 {...register('fullName', {
                   required: 'Full Name is required',
                 })}
+                defaultValue={user?.name}
               />
               {errors.fullName && (
                 <span className="text-sm text-red-500">
@@ -98,6 +98,7 @@ const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
                 {...register('email', {
                   required: 'E-mail is required',
                 })}
+                defaultValue={user?.email}
               />
               {errors.email && (
                 <span className="text-sm text-red-500">
@@ -114,6 +115,7 @@ const EditUser: FC<IProps> = ({ isOpen, setIsOpen, user }) => {
                 {...register('goLoginId', {
                   required: 'GoLoginId is required',
                 })}
+                defaultValue={user?.goLoginId}
               />
               {errors.goLoginId && (
                 <span className="text-sm text-red-500">

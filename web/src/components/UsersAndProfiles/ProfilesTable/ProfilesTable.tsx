@@ -10,7 +10,7 @@ import {
 import { Edit, Share, Trash2 } from 'lucide-react'
 import React, { FC } from 'react'
 import { IProfile } from '@/interfaces/profile.interface'
-import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
+import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
 import { IUser } from '@/interfaces/user.interface'
 
 interface IProps {
@@ -28,7 +28,7 @@ export const ProfilesTable: FC<IProps> = ({
 }) => {
   return (
     <>
-      <div className="rounded-lg border">
+      <div className="rounded-t-lg border">
         <div className="pl-5 pr-5 pt-5">
           <Table>
             <TableHeader>

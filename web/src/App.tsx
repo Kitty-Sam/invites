@@ -2,12 +2,11 @@ import type { ReactNode } from 'react'
 
 import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
-
 import FatalErrorPage from 'src/pages/FatalErrorPage'
+import { Provider } from 'react-redux'
+import { store } from '@/store/store'
 
 import './index.css'
-
-
 
 interface AppProps {
   children?: ReactNode
@@ -15,9 +14,11 @@ interface AppProps {
 
 const App = ({ children }: AppProps) => (
   <FatalErrorBoundary page={FatalErrorPage}>
-    <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-      <RedwoodApolloProvider>{children}</RedwoodApolloProvider>
-    </RedwoodProvider>
+    <Provider store={store}>
+      <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
+        <RedwoodApolloProvider>{children}</RedwoodApolloProvider>
+      </RedwoodProvider>
+    </Provider>
   </FatalErrorBoundary>
 )
 
