@@ -41,7 +41,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-const AVAILABLE_SPECIALTIES = [
+export const AVAILABLE_SPECIALTIES = [
   'Web Design',
   'UX design',
   'Frontend development',
@@ -229,8 +229,8 @@ export const EditUser: FC<IProps> = () => {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
-              <span>Save</span>
+            <Button variant="default" type="submit">
+              Save
             </Button>
           </div>
         </form>

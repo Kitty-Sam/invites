@@ -277,7 +277,7 @@ export const NewInvite: FC<IProps> = () => {
             >
               Discard
             </Button>
-            <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
+            <Button variant="default" type="submit">
               <img src="/send.png" alt="Send" className="h-5 w-5" />
               <span>Send Invite</span>
             </Button>

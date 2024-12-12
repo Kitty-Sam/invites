@@ -149,17 +149,11 @@ export const ManageUsers: FC<IProps> = () => {
             </div>
           ))}
         </div>
-        {/*<form*/}
-        {/*  onSubmit={handleSubmit(onSubmit)}*/}
-        {/*  className="space-y-4"*/}
-        {/*  autoComplete="off"*/}
-        {/*>*/}
         <div className="flex justify-end">
-          <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
-            <span>Save</span>
+          <Button variant="default" type="submit">
+            Save
           </Button>
         </div>
-        {/*</form>*/}
       </DialogContent>
     </Dialog>
   )

@@ -9,7 +9,7 @@ export interface IProps {
 
 export const ButtonWithIconCustom: FC<IProps> = ({ src, title, onClick }) => {
   return (
-    <Button className="bg-blue-500 hover:bg-blue-600" onClick={onClick}>
+    <Button variant="default" onClick={onClick}>
       <img src={src} alt={title} className="h-5 w-5" />
       <span>{title}</span>
     </Button>

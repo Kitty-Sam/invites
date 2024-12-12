@@ -57,7 +57,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
           <RefreshCwOff className="h-4 w-4" />
           Resync with Upwork
         </Button>
-        <Button>Save</Button>
+        <Button variant="default">Save</Button>
       </div>
       <div className="mx-auto flex gap-6 p-4">
         <div className="flex-1 rounded-lg border bg-white px-6 py-6">

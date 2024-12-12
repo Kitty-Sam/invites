@@ -15,6 +15,12 @@ import { IUser } from '@/interfaces/user.interface'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { PageType, showPage } from '@/store/reducers/pageReducer'
+import {
+  ModalsType,
+  saveModalValue,
+  showModal,
+} from '@/store/reducers/modalReducer'
+import { DeleteProfile } from '@/components/UsersAndProfiles/DeleteProfile/DeleteProfile'
 
 interface IProps {
   profiles: IProfile[] | IUser[]
@@ -32,6 +38,8 @@ export const ProfilesTable: FC<IProps> = ({
   setCurrentProfile,
 }) => {
   const dispatch = useAppDispatch()
+  const modalType = useAppSelector(getCurrentModalType)
+
   return (
     <>
       <div className="rounded-t-lg border">
@@ -76,9 +84,21 @@ export const ProfilesTable: FC<IProps> = ({
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" className="px-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="px-2"
+                        onClick={() => {
+                          dispatch(saveModalValue(profile.id))
+                          dispatch(showModal(ModalsType.DELETE_UPWORK_PROFILE))
+                        }}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+
+                      {modalType === ModalsType.DELETE_UPWORK_PROFILE && (
+                        <DeleteProfile />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

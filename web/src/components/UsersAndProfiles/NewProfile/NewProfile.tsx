@@ -12,10 +12,24 @@ import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+import { AVAILABLE_SPECIALTIES } from '@/components/UsersAndProfiles/EditUser/EditUser'
+import { Button } from '@/components/ui/button'
 
 export interface IProps {}
 
-const formSchema = z.object({})
+const formSchema = z.object({
+  speciality: z.string().min(2, {
+    message: 'Speciality must be at least 2 characters.',
+  }),
+})
 
 type FormData = z.infer<typeof formSchema>
 
@@ -37,6 +51,10 @@ export const NewProfile: FC<IProps> = () => {
     reset()
   }
 
+  const onProfileSpecialityChange = (value: string) => {
+    setValue('speciality', value)
+  }
+
   return (
     <Dialog
       open={modalType === ModalsType.ADD_UPWORK_PROFILE}
@@ -49,6 +67,34 @@ export const NewProfile: FC<IProps> = () => {
             Here you can add Upwork profiles
           </DialogDescription>
         </DialogHeader>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          autoComplete="off"
+        >
+          <div className="space-y-1">
+            <label htmlFor="speciality" className="block text-sm font-medium">
+              Specialized profiles
+            </label>
+            <Select onValueChange={onProfileSpecialityChange} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a speciality" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {AVAILABLE_SPECIALTIES.map((el) => (
+                  <SelectItem value={el} key={el}>
+                    {el}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="default" type="submit">
+              Save
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )

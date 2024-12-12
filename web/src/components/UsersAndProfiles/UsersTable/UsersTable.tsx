@@ -20,6 +20,7 @@ import {
   saveModalValue,
   showModal,
 } from '@/store/reducers/modalReducer'
+import { DeleteUser } from '@/components/UsersAndProfiles/DeleteUser/DeleteUser'
 
 interface IProps {
   users: IUser[] | IProfile[]
@@ -107,9 +108,20 @@ export const UsersTable: FC<IProps> = ({
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" className="px-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="px-2"
+                        onClick={() => {
+                          dispatch(saveModalValue(user.id))
+                          dispatch(showModal(ModalsType.DELETE_UPWORK_USER))
+                        }}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                      {modalType === ModalsType.DELETE_UPWORK_USER && (
+                        <DeleteUser />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
