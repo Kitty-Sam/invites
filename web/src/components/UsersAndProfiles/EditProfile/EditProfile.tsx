@@ -14,6 +14,7 @@ import { EditTitle } from '@/components/UsersAndProfiles/EditTitle/EditTitle'
 import { ShowTranscription } from '@/components/UsersAndProfiles/ShowTranscription/ShowTranscription'
 import { ManageUsers } from '@/components/UsersAndProfiles/ManageUsers/ManageUsers'
 import { EditValueProposition } from '@/components/UsersAndProfiles/EditValueProposition/EditValueProposition'
+import { NewPortfolioProject } from '@/components/UsersAndProfiles/NewPortfolioProject/NewPortfolioProject'
 
 export interface IProps {
   profile: IProfile
@@ -138,9 +139,17 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
+                onClick={() => {
+                  dispatch(
+                    showModal(ModalsType.ADD_UPWORK_PROJECT_TO_PORTFOLIO)
+                  )
+                }}
               >
                 <Edit className="h-4 w-4" />
               </Button>
+              {modalType === ModalsType.ADD_UPWORK_PROJECT_TO_PORTFOLIO && (
+                <NewPortfolioProject />
+              )}
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               <Card>

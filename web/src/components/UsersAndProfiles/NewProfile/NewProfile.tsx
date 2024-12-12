@@ -19,7 +19,7 @@ const formSchema = z.object({})
 
 type FormData = z.infer<typeof formSchema>
 
-const NewProfile: FC<IProps> = () => {
+export const NewProfile: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -53,5 +53,3 @@ const NewProfile: FC<IProps> = () => {
     </Dialog>
   )
 }
-
-export default NewProfile
