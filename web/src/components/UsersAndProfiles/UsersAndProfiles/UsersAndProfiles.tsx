@@ -73,7 +73,7 @@ const profiles = [
   },
 ] as IProfile[]
 
-const UsersAndProfiles = () => {
+export const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
   const [currentPage, setCurrentPage] = useState(1)
   const [currentProfile, setCurrentProfile] = useState<IProfile | null>(null)
@@ -172,5 +172,3 @@ const UsersAndProfiles = () => {
     </UsersAndProfilesLayout>
   )
 }
-
-export default UsersAndProfiles

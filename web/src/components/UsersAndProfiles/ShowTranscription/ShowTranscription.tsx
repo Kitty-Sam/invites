@@ -1,5 +1,4 @@
 import React, { FC } from 'react'
-import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
@@ -7,23 +6,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
+import {
+  clearModalValue,
+  closeModal,
+  ModalsType,
+} from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 
-export interface IProps {
-  transcription: string[]
-}
+export interface IProps {}
 
-export const ShowTranscription: FC<IProps> = ({ transcription }) => {
+export const ShowTranscription: FC<IProps> = () => {
   const modalType = useAppSelector(getCurrentModalType)
+  const transcription = useAppSelector(getCurrentModalValue)
+
   const dispatch = useDispatch()
+
+  const onCloseModal = () => {
+    dispatch(closeModal())
+    dispatch(clearModalValue())
+  }
 
   return (
     <Dialog
       open={modalType === ModalsType.SHOW_INTERVIEW_TRANSCRIPTION}
-      onOpenChange={() => dispatch(closeModal())}
+      onOpenChange={onCloseModal}
     >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
@@ -32,7 +40,9 @@ export const ShowTranscription: FC<IProps> = ({ transcription }) => {
             Here you can see transcription
           </DialogDescription>
         </DialogHeader>
-        <p>hello</p>
+        {transcription.map((item, i) => (
+          <p key={i}>{item}</p>
+        ))}
       </DialogContent>
     </Dialog>
   )

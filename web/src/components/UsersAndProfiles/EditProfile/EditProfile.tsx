@@ -2,28 +2,50 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { CircleX, Edit, FileType2, RefreshCwOff, UserPlus } from 'lucide-react'
 import { IProfile } from '@/interfaces/profile.interface'
-import React, { FC, useState } from 'react'
-import { ModalsType, showModal } from '@/store/reducers/modalReducer'
+import React, { FC } from 'react'
+import {
+  ModalsType,
+  saveModalValue,
+  showModal,
+} from '@/store/reducers/modalReducer'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { EditTitle } from '@/components/UsersAndProfiles/EditTitle/EditTitle'
 import { ShowTranscription } from '@/components/UsersAndProfiles/ShowTranscription/ShowTranscription'
+import { ManageUsers } from '@/components/UsersAndProfiles/ManageUsers/ManageUsers'
+import { EditValueProposition } from '@/components/UsersAndProfiles/EditValueProposition/EditValueProposition'
 
 export interface IProps {
   profile: IProfile
 }
 
+const valueProposition = `Transforming complex ideas into seamless, user-friendly interfaces
+by leveraging modern web technologies. I specialize in crafting
+responsive, accessible, and visually appealing websites that drive
+engagement and enhance user experience. With a focus on clean code
+and performance optimization, I bring creativity and technical
+expertise to every project`
+
 const interviews = [
-  { name: 'Yuriy R.', date: 'November 29, 2024', transcription: ['hello'] },
-  { name: 'Julia B.', date: 'December 6, 2024', transcription: ['hello'] },
-  { name: 'John S.', date: 'December 19, 2024', transcription: ['hello'] },
+  {
+    name: 'Yuriy R.',
+    date: 'November 29, 2024',
+    transcription: ['hello, Yuriy R'],
+  },
+  {
+    name: 'Julia B.',
+    date: 'December 6, 2024',
+    transcription: ['hello, Julia B'],
+  },
+  {
+    name: 'John S.',
+    date: 'December 19, 2024',
+    transcription: ['hello, John S'],
+  },
   { name: 'Monica J.', date: 'December 29, 2024', transcription: ['hello'] },
 ]
 
 export const EditProfile: FC<IProps> = ({ profile }) => {
-  const [currentTitle, setCurrentTitle] = useState<string>('')
-  const [currentTranscription, setCurrentTranscription] = useState<string[]>([])
-
   const dispatch = useAppDispatch()
   const modalType = useAppSelector(getCurrentModalType)
 
@@ -37,7 +59,6 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
         <Button>Save</Button>
       </div>
       <div className="mx-auto flex gap-6 p-4">
-        {/* Main Content */}
         <div className="flex-1 rounded-lg border bg-white px-6 py-6">
           {/* Header Section */}
           <div className="space-y-2">
@@ -48,7 +69,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                 size="sm"
                 className="flex items-center gap-2"
                 onClick={() => {
-                  setCurrentTitle(profile.name)
+                  dispatch(saveModalValue(profile.name))
                   dispatch(showModal(ModalsType.EDIT_UPWORK_PROFILE_TITLE))
                 }}
               >
@@ -56,7 +77,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
               </Button>
 
               {modalType === ModalsType.EDIT_UPWORK_PROFILE_TITLE && (
-                <EditTitle title={currentTitle} />
+                <EditTitle />
               )}
             </div>
             <p className="border-b pb-4 text-muted-foreground">
@@ -72,18 +93,18 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
+                onClick={() => {
+                  dispatch(saveModalValue(valueProposition))
+                  dispatch(showModal(ModalsType.EDIT_UPWORK_VALUE_PROPOSITION))
+                }}
               >
                 <Edit className="h-4 w-4" />
               </Button>
+              {modalType === ModalsType.EDIT_UPWORK_VALUE_PROPOSITION && (
+                <EditValueProposition />
+              )}
             </div>
-            <p className="border-b pb-4 text-black">
-              Transforming complex ideas into seamless, user-friendly interfaces
-              by leveraging modern web technologies. I specialize in crafting
-              responsive, accessible, and visually appealing websites that drive
-              engagement and enhance user experience. With a focus on clean code
-              and performance optimization, I bring creativity and technical
-              expertise to every project.
-            </p>
+            <p className="border-b pb-4 text-black">{valueProposition}</p>
           </div>
 
           {/* Offers Section */}
@@ -183,14 +204,28 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-2"
+                  onClick={() => {
+                    dispatch(
+                      saveModalValue(
+                        profile.users.map((user) => ({
+                          name: user,
+                          email: '',
+                        }))
+                      )
+                    )
+                    dispatch(showModal(ModalsType.MANAGE_UPWORK_USERS))
+                  }}
                 >
                   <UserPlus className="h-4 w-4" />
                 </Button>
+                {modalType === ModalsType.MANAGE_UPWORK_USERS && (
+                  <ManageUsers />
+                )}
               </div>
               <div className="space-y-3">
                 {profile.users.map((user) => (
                   <div
-                    className="inline-flex items-center space-x-2 rounded-l bg-gray-100 px-3 py-1 text-sm text-black"
+                    className="inline-flex items-center space-x-2 rounded bg-gray-100 px-3 py-1 text-sm text-black"
                     key={user}
                   >
                     <span>{user}</span>
@@ -227,7 +262,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                       size="sm"
                       className="flex items-center gap-2"
                       onClick={() => {
-                        setCurrentTranscription(interview.transcription)
+                        dispatch(saveModalValue(interview.transcription))
                         dispatch(
                           showModal(ModalsType.SHOW_INTERVIEW_TRANSCRIPTION)
                         )
@@ -236,7 +271,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                       <FileType2 className="h-4 w-4" />
                     </Button>
                     {modalType === ModalsType.SHOW_INTERVIEW_TRANSCRIPTION && (
-                      <ShowTranscription transcription={currentTranscription} />
+                      <ShowTranscription />
                     )}
                   </div>
                 ))}

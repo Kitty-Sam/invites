@@ -1,7 +1,13 @@
 import React from 'react'
-import { ChevronDown, Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { ChevronDown, Settings, Target, Users, Zap } from 'lucide-react'
 import { UserAvatar } from '@/components/shared/UserAvatar/UserAvatar'
+import { SearchInputCustom } from '@/components/shared/SearchInputCustom/SearchInputCustom'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export const Header = () => {
   return (
@@ -20,21 +26,35 @@ export const Header = () => {
               </a>
               <ChevronDown className="h-4 w-4" />
             </div>
-            <div className="flex items-center space-x-1">
-              <a
-                href="/agency"
-                className="flex items-center font-medium transition-colors hover:text-foreground/80"
-              >
-                Agency
-              </a>
-              <ChevronDown className="h-4 w-4" />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-1 font-medium transition-colors hover:text-foreground/80 focus:outline-none">
+                <span>Agency</span>
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                <DropdownMenuItem>
+                  <Users className="mr-2 h-4 w-4" />
+                  Agency Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Target className="mr-2 h-4 w-4" />
+                  Value Propositions
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  ICP Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Zap className="mr-2 h-4 w-4" />
+                  Automatization
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search..." className="pl-8" />
+          <div className="relative mt-4">
+            <SearchInputCustom />
           </div>
           <UserAvatar />
         </div>

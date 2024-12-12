@@ -10,11 +10,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
-import { IUser } from '@/interfaces/user.interface'
 import { useDispatch } from 'react-redux'
 import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import {
   Select,
   SelectContent,
@@ -25,9 +24,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { X } from 'lucide-react'
 
-export interface IProps {
-  user: IUser
-}
+export interface IProps {}
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -55,7 +52,12 @@ const AVAILABLE_SPECIALTIES = [
   'Lead generation',
 ]
 
-export const EditUser: FC<IProps> = ({ user }) => {
+export const EditUser: FC<IProps> = () => {
+  const modalType = useAppSelector(getCurrentModalType)
+  const user = useAppSelector(getCurrentModalValue)
+
+  const dispatch = useDispatch()
+
   const {
     register,
     handleSubmit,
@@ -76,9 +78,6 @@ export const EditUser: FC<IProps> = ({ user }) => {
   const [userSpecialties, setUserSpecialties] = useState<string[]>(
     user?.specialties
   )
-
-  const modalType = useAppSelector(getCurrentModalType)
-  const dispatch = useDispatch()
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     // dispatch(closeModal())

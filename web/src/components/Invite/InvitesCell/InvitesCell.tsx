@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { EStatus } from '@/enums/invite-status.enum'
 import Invites, { ITEMS_PER_PAGE } from '@/components/Invite/Invites/Invites'
 import { NewInvite } from '@/components/Invite/NewInvite/NewInvite'
+import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
 
 // Запрос на получение данных по странице
 export const QUERY = gql`
@@ -115,17 +116,19 @@ export const Success = () => {
   }
 
   return (
-    <Invites
-      invites={invites}
-      totalItems={totalItems}
-      onUpdateInvite={handleUpdateInvite}
-      onResendInvite={handleResendInvite}
-      setSelectedStatus={setSelectedStatus}
-      selectedStatus={selectedStatus}
-      setCurrentPage={setCurrentPage}
-      currentPage={currentPage}
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-    />
+    <UsersAndProfilesLayout>
+      <Invites
+        invites={invites}
+        totalItems={totalItems}
+        onUpdateInvite={handleUpdateInvite}
+        onResendInvite={handleResendInvite}
+        setSelectedStatus={setSelectedStatus}
+        selectedStatus={selectedStatus}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+    </UsersAndProfilesLayout>
   )
 }

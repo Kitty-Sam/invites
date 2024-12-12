@@ -1,4 +1,4 @@
-import UsersAndProfiles from '@/components/UsersAndProfiles/UsersAndProfiles/UsersAndProfiles'
+import { UsersAndProfiles } from '@/components/UsersAndProfiles/UsersAndProfiles/UsersAndProfiles'
 
 const UsersAndProfilesPage = () => {
   return <UsersAndProfiles />

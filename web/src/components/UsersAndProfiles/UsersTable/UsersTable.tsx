@@ -15,7 +15,11 @@ import { IProfile } from '@/interfaces/profile.interface'
 import { EditUser } from '@/components/UsersAndProfiles/EditUser/EditUser'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
-import { ModalsType, showModal } from '@/store/reducers/modalReducer'
+import {
+  ModalsType,
+  saveModalValue,
+  showModal,
+} from '@/store/reducers/modalReducer'
 
 interface IProps {
   users: IUser[] | IProfile[]
@@ -89,8 +93,8 @@ export const UsersTable: FC<IProps> = ({
                         size="sm"
                         className="flex items-center gap-2"
                         onClick={() => {
+                          dispatch(saveModalValue(user))
                           dispatch(showModal(ModalsType.EDIT_UPWORK_USER))
-                          setCurrentUser(user)
                         }}
                       >
                         <Edit className="h-4 w-4" />
@@ -98,7 +102,7 @@ export const UsersTable: FC<IProps> = ({
                       </Button>
 
                       {modalType === ModalsType.EDIT_UPWORK_USER && (
-                        <EditUser user={currentUser} />
+                        <EditUser />
                       )}
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />

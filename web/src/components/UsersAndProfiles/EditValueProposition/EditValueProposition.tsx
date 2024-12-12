@@ -16,20 +16,20 @@ import {
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
-import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
 export interface IProps {}
 
 const formSchema = z.object({
-  title: z.string().min(2, {
+  valueProposition: z.string().min(2, {
     message: 'title should be at least 2 characters.',
   }),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export const EditTitle: FC<IProps> = () => {
+export const EditValueProposition: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -39,7 +39,7 @@ export const EditTitle: FC<IProps> = () => {
   } = useForm<FormData>()
 
   const modalType = useAppSelector(getCurrentModalType)
-  const title = useAppSelector(getCurrentModalValue)
+  const valueProposition = useAppSelector(getCurrentModalValue)
   const dispatch = useDispatch()
 
   const onCloseModal = () => {
@@ -55,15 +55,16 @@ export const EditTitle: FC<IProps> = () => {
 
   return (
     <Dialog
-      open={modalType === ModalsType.EDIT_UPWORK_PROFILE_TITLE}
+      open={modalType === ModalsType.EDIT_UPWORK_VALUE_PROPOSITION}
       onOpenChange={onCloseModal}
     >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Edit your title</DialogTitle>
+          <DialogTitle className="text-xl">
+            Edit your value proposition
+          </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Enter a single sentence description of your professional
-            skills/experience
+            Enter your professional value proposition
           </DialogDescription>
         </DialogHeader>
         <form
@@ -73,22 +74,21 @@ export const EditTitle: FC<IProps> = () => {
         >
           <div className="grid grid-cols-1 gap-4">
             <div className="grid gap-2">
-              <InputCustom
-                id="title"
-                type="text"
-                label="Title"
-                required
-                {...register('title', {
-                  required: 'Title is required',
-                })}
-                defaultValue={title}
+              <label htmlFor="message">Value Proposition</label>
+              <Textarea
+                id="valueProposition"
+                placeholder="Enter your value proposition here"
+                className="min-h-[200px]"
+                {...register('valueProposition')}
+                defaultValue={valueProposition}
               />
-              {errors.title && (
-                <span className="text-sm text-red-500">
-                  {errors.title.message}
-                </span>
-              )}
             </div>
+
+            {errors.valueProposition && (
+              <span className="text-sm text-red-500">
+                {errors.valueProposition.message}
+              </span>
+            )}
           </div>
           <div className="flex justify-end">
             <Button className="bg-blue-500 hover:bg-blue-600" type="submit">

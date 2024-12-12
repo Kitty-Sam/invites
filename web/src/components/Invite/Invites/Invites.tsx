@@ -22,6 +22,7 @@ import { getCurrentModalType } from '@/store/selectors'
 import { ModalsType, showModal } from '@/store/reducers/modalReducer'
 import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
 import { useDispatch } from 'react-redux'
+import { SearchInputCustom } from '@/components/shared/SearchInputCustom/SearchInputCustom'
 
 export const ITEMS_PER_PAGE = 5
 
@@ -80,18 +81,14 @@ const Invites: FC<IProps> = ({
 
   return (
     <>
-      <div className="flex items-start justify-end gap-2">
-        <div className="relative">
-          <InputCustom
-            label=""
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="w-[200px] pl-8 pr-8"
-          />
-        </div>
-      </div>
+      {/*<div className="flex items-start justify-end gap-2">*/}
+      {/*  <div className="relative mt-2">*/}
+      {/*    <SearchInputCustom*/}
+      {/*      value={searchQuery}*/}
+      {/*      onChange={handleSearchChange}*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
       <div className="flex justify-between">
         <TabNavigationCustom
@@ -126,7 +123,7 @@ const Invites: FC<IProps> = ({
             <TableHeader>
               <TableRow>
                 <TableHead colSpan={3} className="space-y-1.5 pb-10 text-left">
-                  <h2 className="text-2xl font-semibold">Invites</h2>
+                  <h2 className="text-2xl font-semibold text-black">Invites</h2>
                   <p className="text-sm text-gray-500">Manage your invites</p>
                 </TableHead>
               </TableRow>
