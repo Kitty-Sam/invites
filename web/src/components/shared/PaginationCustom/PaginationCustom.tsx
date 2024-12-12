@@ -14,13 +14,13 @@ export interface IProps {
   totalPages: number
 }
 
-const PaginationCustom: FC<IProps> = ({
+export const PaginationCustom: FC<IProps> = ({
   onPageChange,
   totalPages,
   currentPage,
 }) => {
   return (
-    <div className="space-y-4 bg-gray-100 p-4">
+    <div className="space-y-4 rounded-b-lg border border-b border-l border-r border-gray-200 bg-gray-100 p-4">
       <Pagination className="flex justify-end">
         <PaginationContent>
           <PaginationItem>
@@ -54,5 +54,3 @@ const PaginationCustom: FC<IProps> = ({
     </div>
   )
 }
-
-export default PaginationCustom

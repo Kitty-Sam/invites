@@ -10,14 +10,18 @@ import {
 import { Edit, Share, Trash2 } from 'lucide-react'
 import React, { FC } from 'react'
 import { IProfile } from '@/interfaces/profile.interface'
-import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
+import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
 import { IUser } from '@/interfaces/user.interface'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
+import { PageType, showPage } from '@/store/reducers/pageReducer'
 
 interface IProps {
   profiles: IProfile[] | IUser[]
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  setCurrentProfile: any
 }
 
 export const ProfilesTable: FC<IProps> = ({
@@ -25,10 +29,12 @@ export const ProfilesTable: FC<IProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  setCurrentProfile,
 }) => {
+  const dispatch = useAppDispatch()
   return (
     <>
-      <div className="rounded-lg border">
+      <div className="rounded-t-lg border">
         <div className="pl-5 pr-5 pt-5">
           <Table>
             <TableHeader>
@@ -59,6 +65,10 @@ export const ProfilesTable: FC<IProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
+                        onClick={() => {
+                          setCurrentProfile(profile)
+                          dispatch(showPage(PageType.EDIT_UPWORK_PROFILE))
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                         Edit

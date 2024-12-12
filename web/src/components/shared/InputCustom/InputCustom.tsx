@@ -16,7 +16,7 @@ export const InputCustom = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...props}
-          className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-500"
+          className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-300"
         />
         {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
       </div>

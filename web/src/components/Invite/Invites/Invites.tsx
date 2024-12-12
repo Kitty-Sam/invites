@@ -1,4 +1,4 @@
-import React, { FC, useState, useTransition } from 'react'
+import React, { FC, useTransition } from 'react'
 import {
   Table,
   TableBody,
@@ -14,9 +14,15 @@ import { formatDate } from '@/helpers/date/formatDate'
 import { IInvite } from 'src/interfaces/invite.interface'
 
 import { NewInvite } from '@/components/Invite/NewInvite/NewInvite'
-import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
+import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
+import { useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
+import { ModalsType, showModal } from '@/store/reducers/modalReducer'
+import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
+import { useDispatch } from 'react-redux'
+import { SearchInputCustom } from '@/components/shared/SearchInputCustom/SearchInputCustom'
 
 export const ITEMS_PER_PAGE = 5
 
@@ -52,8 +58,9 @@ const Invites: FC<IProps> = ({
   setSearchQuery,
   totalItems,
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
   const [_, startTransition] = useTransition()
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useDispatch()
 
   const totalPages = totalItems ? Math.ceil(totalItems / ITEMS_PER_PAGE) : 1
 
@@ -74,18 +81,14 @@ const Invites: FC<IProps> = ({
 
   return (
     <>
-      <div className="flex items-start justify-end gap-2">
-        <div className="relative">
-          <InputCustom
-            label=""
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="w-[200px] pl-8 pr-8"
-          />
-        </div>
-      </div>
+      {/*<div className="flex items-start justify-end gap-2">*/}
+      {/*  <div className="relative mt-2">*/}
+      {/*    <SearchInputCustom*/}
+      {/*      value={searchQuery}*/}
+      {/*      onChange={handleSearchChange}*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
       <div className="flex justify-between">
         <TabNavigationCustom
@@ -95,7 +98,23 @@ const Invites: FC<IProps> = ({
             setSelectedStatus(tab)
           }}
         />
-        <NewInvite setIsOpen={setIsOpen} isOpen={isOpen} />
+
+        {modalType === ModalsType.ADD_INVITE ? (
+          <>
+            <ButtonWithIconCustom
+              src="/plus.png"
+              onClick={() => {}}
+              title="New Invite"
+            />
+            <NewInvite />
+          </>
+        ) : (
+          <ButtonWithIconCustom
+            src="/plus.png"
+            onClick={() => dispatch(showModal(ModalsType.ADD_INVITE))}
+            title="New Invite"
+          />
+        )}
       </div>
 
       <div className="rounded-lg border">
@@ -104,7 +123,7 @@ const Invites: FC<IProps> = ({
             <TableHeader>
               <TableRow>
                 <TableHead colSpan={3} className="space-y-1.5 pb-10 text-left">
-                  <h2 className="text-2xl font-semibold">Invites</h2>
+                  <h2 className="text-2xl font-semibold text-black">Invites</h2>
                   <p className="text-sm text-gray-500">Manage your invites</p>
                 </TableHead>
               </TableRow>

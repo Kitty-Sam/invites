@@ -7,25 +7,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
-import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import {
+  clearModalValue,
+  closeModal,
+  ModalsType,
+} from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
-import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import { Button } from '@/components/ui/button'
 
 export interface IProps {}
 
 const formSchema = z.object({
-  goLoginId: z.string().min(2, {
-    message: 'goLogin should be at least 2 characters.',
+  title: z.string().min(2, {
+    message: 'title should be at least 2 characters.',
   }),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewUser: FC<IProps> = () => {
+export const EditTitle: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -35,24 +39,31 @@ export const NewUser: FC<IProps> = () => {
   } = useForm<FormData>()
 
   const modalType = useAppSelector(getCurrentModalType)
+  const title = useAppSelector(getCurrentModalValue)
   const dispatch = useDispatch()
+
+  const onCloseModal = () => {
+    dispatch(closeModal())
+    dispatch(clearModalValue())
+  }
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log('data', data)
-    dispatch(closeModal())
+    onCloseModal()
     reset()
   }
 
   return (
     <Dialog
-      open={modalType === ModalsType.ADD_UPWORK_USER}
-      onOpenChange={() => dispatch(closeModal())}
+      open={modalType === ModalsType.EDIT_UPWORK_PROFILE_TITLE}
+      onOpenChange={onCloseModal}
     >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add User</DialogTitle>
+          <DialogTitle className="text-xl">Edit your title</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Here you can add Upwork users
+            Enter a single sentence description of your professional
+            skills/experience
           </DialogDescription>
         </DialogHeader>
         <form
@@ -63,17 +74,18 @@ export const NewUser: FC<IProps> = () => {
           <div className="grid grid-cols-1 gap-4">
             <div className="grid gap-2">
               <InputCustom
-                id="goLoginId"
+                id="title"
                 type="text"
-                label="Gologin ID"
+                label="Title"
                 required
-                {...register('goLoginId', {
-                  required: 'Gologin ID is required',
+                {...register('title', {
+                  required: 'Title is required',
                 })}
+                defaultValue={title}
               />
-              {errors.goLoginId && (
+              {errors.title && (
                 <span className="text-sm text-red-500">
-                  {errors.goLoginId.message}
+                  {errors.title.message}
                 </span>
               )}
             </div>

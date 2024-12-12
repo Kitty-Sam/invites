@@ -2,11 +2,18 @@ import React, { useState } from 'react'
 import { UsersTable } from '@/components/UsersAndProfiles/UsersTable/UsersTable'
 import { ProfilesTable } from '@/components/UsersAndProfiles/ProfilesTable/ProfilesTable'
 import { EUsersOrProfilesMode } from '@/enums/users-profiles-mode.enum'
-import NewUser from '@/components/UsersAndProfiles/NewUser/NewUser'
-import NewProfile from '@/components/UsersAndProfiles/NewProfile/NewProfile'
+import { NewUser } from '@/components/UsersAndProfiles/NewUser/NewUser'
+import { NewProfile } from '@/components/UsersAndProfiles/NewProfile/NewProfile'
 import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
 import { IUser } from '@/interfaces/user.interface'
+import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { getCurrentModalType, getCurrentPageType } from '@/store/selectors'
+import { ModalsType, showModal } from '@/store/reducers/modalReducer'
+import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
+import { EditProfile } from '@/components/UsersAndProfiles/EditProfile/EditProfile'
+import { PageType } from '@/store/reducers/pageReducer'
 
 const ITEMS_PER_PAGE = 5
 
@@ -17,28 +24,28 @@ const users = [
     name: 'Stephanie Sharkey',
     email: 'steph55@gmail.com',
     goLoginId: 'fadsfhsa66×719x',
-    specializedProfiles: ['Web Design', 'UX design', 'Frontend development'],
+    specialties: ['Web Design', 'UX design', 'Frontend development'],
   },
   {
     id: '2',
     name: 'Joshua Jones',
     email: 'j.jones@aol.com',
     goLoginId: 'kjlkf43u345h',
-    specializedProfiles: ['Machine Learning'],
+    specialties: ['Machine Learning'],
   },
   {
     id: '3',
     name: 'Rhonda Rhodes',
     email: 'r.rhodes@outlook.com',
     goLoginId: 'fjsdbfbqjwt',
-    specializedProfiles: ['Product Management', 'Marketing Strategy'],
+    specialties: ['Product Management', 'Marketing Strategy'],
   },
   {
     id: '4',
     name: 'James Hall',
     email: 'j.hall367@outlook.com',
     goLoginId: 'gkmgotmoboteo17132',
-    specializedProfiles: ['3D Animation'],
+    specialties: ['3D Animation'],
   },
 ] as IUser[]
 
@@ -65,13 +72,15 @@ const profiles = [
   },
 ] as IProfile[]
 
-const UsersAndProfiles = () => {
+export const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
-  const [isAddUser, setIsAddUser] = useState(false)
-  const [isAddProfile, setIsAddProfile] = useState(false)
-  const [isEditUser, setIsEditUser] = useState(false)
-
   const [currentPage, setCurrentPage] = useState(1)
+  const [currentProfile, setCurrentProfile] = useState<IProfile | null>(null)
+
+  const modalType = useAppSelector(getCurrentModalType)
+  const pageType = useAppSelector(getCurrentPageType)
+
+  const dispatch = useAppDispatch()
 
   const currentData =
     activeTab === EUsersOrProfilesMode.USERS ? users : profiles
@@ -85,45 +94,80 @@ const UsersAndProfiles = () => {
   )
 
   return (
-    <>
-      <div className="flex justify-between">
-        <TabNavigationCustom
-          tabs={[EUsersOrProfilesMode.USERS, EUsersOrProfilesMode.PROFILES]}
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab)
-            setCurrentPage(1)
-          }}
-        />
-
-        {activeTab === EUsersOrProfilesMode.USERS ? (
-          <NewUser setIsOpen={setIsAddUser} isOpen={isAddUser} />
-        ) : (
-          <NewProfile setIsOpen={setIsAddProfile} isOpen={isAddProfile} />
-        )}
-      </div>
-
-      {activeTab === EUsersOrProfilesMode.USERS ? (
-        <>
-          <UsersTable
-            users={paginatedData}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            isEditUser={isEditUser}
-            setIsEditUser={setIsEditUser}
-          />
-        </>
+    <UsersAndProfilesLayout>
+      {pageType === PageType.EDIT_UPWORK_PROFILE ? (
+        <EditProfile profile={currentProfile} />
       ) : (
-        <ProfilesTable
-          profiles={paginatedData}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        <>
+          <div className="flex justify-between">
+            <TabNavigationCustom
+              tabs={[EUsersOrProfilesMode.USERS, EUsersOrProfilesMode.PROFILES]}
+              activeTab={activeTab}
+              onTabChange={(tab) => {
+                setActiveTab(tab)
+                setCurrentPage(1)
+              }}
+            />
+
+            {activeTab === EUsersOrProfilesMode.USERS ? (
+              modalType === ModalsType.ADD_UPWORK_USER ? (
+                <>
+                  <ButtonWithIconCustom
+                    onClick={() => {}}
+                    title={'Add User'}
+                    src={'/plus.png'}
+                  />
+                  <NewUser />
+                </>
+              ) : (
+                <ButtonWithIconCustom
+                  onClick={() =>
+                    dispatch(showModal(ModalsType.ADD_UPWORK_USER))
+                  }
+                  title={'Add User'}
+                  src={'/plus.png'}
+                />
+              )
+            ) : modalType === ModalsType.ADD_UPWORK_PROFILE ? (
+              <>
+                <ButtonWithIconCustom
+                  onClick={() => {}}
+                  title={'Add Profile'}
+                  src={'/plus.png'}
+                />
+                <NewProfile />
+              </>
+            ) : (
+              <ButtonWithIconCustom
+                onClick={() =>
+                  dispatch(showModal(ModalsType.ADD_UPWORK_PROFILE))
+                }
+                title={'Add Profile'}
+                src={'/plus.png'}
+              />
+            )}
+          </div>
+
+          {activeTab === EUsersOrProfilesMode.USERS ? (
+            <>
+              <UsersTable
+                users={paginatedData}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
+          ) : (
+            <ProfilesTable
+              profiles={paginatedData}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              setCurrentProfile={setCurrentProfile}
+            />
+          )}
+        </>
       )}
-    </>
+    </UsersAndProfilesLayout>
   )
 }
-
-export default UsersAndProfiles

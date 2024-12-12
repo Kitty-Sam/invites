@@ -18,14 +18,18 @@ import { getCurrentModalType } from '@/store/selectors'
 export interface IProps {}
 
 const formSchema = z.object({
-  goLoginId: z.string().min(2, {
-    message: 'goLogin should be at least 2 characters.',
+  projectTitle: z.string().min(2, {
+    message: 'projectTitle should be at least 2 characters.',
   }),
+  role: z.string().min(2, {
+    message: 'role should be at least 2 characters.',
+  }),
+  content: z.any(),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewUser: FC<IProps> = () => {
+export const NewPortfolioProject: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -45,14 +49,14 @@ export const NewUser: FC<IProps> = () => {
 
   return (
     <Dialog
-      open={modalType === ModalsType.ADD_UPWORK_USER}
+      open={modalType === ModalsType.ADD_UPWORK_PROJECT_TO_PORTFOLIO}
       onOpenChange={() => dispatch(closeModal())}
     >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add User</DialogTitle>
+          <DialogTitle className="text-xl">New Portfolio Project</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Here you can add Upwork users
+            Add information about your project
           </DialogDescription>
         </DialogHeader>
         <form
@@ -63,17 +67,33 @@ export const NewUser: FC<IProps> = () => {
           <div className="grid grid-cols-1 gap-4">
             <div className="grid gap-2">
               <InputCustom
-                id="goLoginId"
+                id="projectTitle"
                 type="text"
-                label="Gologin ID"
+                label="Project Title"
                 required
-                {...register('goLoginId', {
-                  required: 'Gologin ID is required',
+                {...register('projectTitle', {
+                  required: 'Project Title is required',
                 })}
               />
-              {errors.goLoginId && (
+              {errors.projectTitle && (
                 <span className="text-sm text-red-500">
-                  {errors.goLoginId.message}
+                  {errors.projectTitle.message}
+                </span>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <InputCustom
+                id="role"
+                type="text"
+                label="Your role"
+                required
+                {...register('role', {
+                  required: 'Your role is required',
+                })}
+              />
+              {errors.role && (
+                <span className="text-sm text-red-500">
+                  {errors.role.message}
                 </span>
               )}
             </div>

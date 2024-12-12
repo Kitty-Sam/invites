@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { EStatus } from '@/enums/invite-status.enum'
 import Invites, { ITEMS_PER_PAGE } from '@/components/Invite/Invites/Invites'
 import { NewInvite } from '@/components/Invite/NewInvite/NewInvite'
+import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
 
 // Запрос на получение данных по странице
 export const QUERY = gql`
@@ -52,11 +53,9 @@ const RESEND_INVITE = gql`
 export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => {
-  const [isOpen, setIsOpen] = useState(false)
-
   return (
     <div className="rw-text-center flex w-full items-center justify-between p-4">
-      <NewInvite setIsOpen={setIsOpen} isOpen={isOpen} />
+      <NewInvite />
       <span className="ml-4">No invites yet</span>
     </div>
   )
@@ -117,17 +116,19 @@ export const Success = () => {
   }
 
   return (
-    <Invites
-      invites={invites}
-      totalItems={totalItems}
-      onUpdateInvite={handleUpdateInvite}
-      onResendInvite={handleResendInvite}
-      setSelectedStatus={setSelectedStatus}
-      selectedStatus={selectedStatus}
-      setCurrentPage={setCurrentPage}
-      currentPage={currentPage}
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-    />
+    <UsersAndProfilesLayout>
+      <Invites
+        invites={invites}
+        totalItems={totalItems}
+        onUpdateInvite={handleUpdateInvite}
+        onResendInvite={handleResendInvite}
+        setSelectedStatus={setSelectedStatus}
+        selectedStatus={selectedStatus}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+    </UsersAndProfilesLayout>
   )
 }

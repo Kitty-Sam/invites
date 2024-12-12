@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -10,18 +10,22 @@ import {
 } from '@/components/ui/table'
 import { Edit, Share, Trash2 } from 'lucide-react'
 import { IUser } from '@/interfaces/user.interface'
-import PaginationCustom from '@/components/shared/PaginationCustom/PaginationCustom'
+import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
-import EditUser from '@/components/UsersAndProfiles/EditUser/EditUser'
+import { EditUser } from '@/components/UsersAndProfiles/EditUser/EditUser'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
+import {
+  ModalsType,
+  saveModalValue,
+  showModal,
+} from '@/store/reducers/modalReducer'
 
 interface IProps {
   users: IUser[] | IProfile[]
   currentPage: number
   totalPages: number
   onPageChange: any
-
-  isEditUser: boolean
-  setIsEditUser: any
 }
 
 export const UsersTable: FC<IProps> = ({
@@ -29,12 +33,15 @@ export const UsersTable: FC<IProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  setIsEditUser,
-  isEditUser,
 }) => {
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useAppDispatch()
+
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null)
+
   return (
     <>
-      <div className="rounded-lg border">
+      <div className="rounded-t-lg border">
         <div className="pl-5 pr-5 pt-5">
           <Table>
             <TableHeader>
@@ -67,14 +74,16 @@ export const UsersTable: FC<IProps> = ({
                   <TableCell>{user.goLoginId}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.specializedProfiles.map((profile, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium"
-                        >
-                          {profile}
-                        </span>
-                      ))}
+                      {user.specialties.map(
+                        (profile: string, index: number) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center rounded-full border  px-2 py-1 text-xs font-medium"
+                          >
+                            {profile}
+                          </span>
+                        )
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -83,18 +92,17 @@ export const UsersTable: FC<IProps> = ({
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
-                        onClick={() => setIsEditUser(user)}
+                        onClick={() => {
+                          dispatch(saveModalValue(user))
+                          dispatch(showModal(ModalsType.EDIT_UPWORK_USER))
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                         Edit
                       </Button>
 
-                      {isEditUser && (
-                        <EditUser
-                          isOpen={isEditUser}
-                          setIsOpen={setIsEditUser}
-                          user={user}
-                        />
+                      {modalType === ModalsType.EDIT_UPWORK_USER && (
+                        <EditUser />
                       )}
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />

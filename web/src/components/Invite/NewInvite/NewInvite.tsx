@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   Select,
@@ -24,6 +23,9 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useApolloClient } from '@apollo/client'
 import { QUERY } from '@/components/Invite/InvitesCell/InvitesCell'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { getCurrentModalType } from '@/store/selectors'
+import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
 
 //Добавление нового инвайта
 const CREATE_INVITE_MUTATION = gql`
@@ -45,10 +47,7 @@ const CREATE_INVITE_MUTATION = gql`
   }
 `
 
-export interface IProps {
-  setIsOpen: (value: boolean) => void
-  isOpen: boolean
-}
+export interface IProps {}
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -79,7 +78,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
+export const NewInvite: FC<IProps> = () => {
   const {
     register,
     handleSubmit,
@@ -89,6 +88,9 @@ export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
   } = useForm<FormData>()
 
   const client = useApolloClient()
+
+  const modalType = useAppSelector(getCurrentModalType)
+  const dispatch = useAppDispatch()
 
   const [createInvite, { loading, error }] = useMutation(
     CREATE_INVITE_MUTATION,
@@ -107,7 +109,7 @@ export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
   )
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    setIsOpen(false)
+    dispatch(closeModal())
 
     const duration = data.inviteDuration ? Number(data.inviteDuration) : 7
 
@@ -136,13 +138,10 @@ export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">
-          <img src="/plus.png" alt="Add New Invite" className="h-5 w-5" />
-          <span>New Invite</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={modalType === ModalsType.ADD_INVITE}
+      onOpenChange={() => dispatch(closeModal())}
+    >
       <DialogContent className="bg-white sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl">New Invitation</DialogTitle>
@@ -278,7 +277,7 @@ export const NewInvite: FC<IProps> = ({ setIsOpen, isOpen }) => {
             >
               Discard
             </Button>
-            <Button className="bg-blue-500 hover:bg-blue-600">
+            <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
               <img src="/send.png" alt="Send" className="h-5 w-5" />
               <span>Send Invite</span>
             </Button>
