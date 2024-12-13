@@ -1,12 +1,5 @@
 import React, { FC } from 'react'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   clearModalValue,
   closeModal,
   ModalsType,
@@ -14,6 +7,7 @@ import {
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
 export interface IProps {}
 
@@ -29,21 +23,17 @@ export const ShowTranscription: FC<IProps> = () => {
   }
 
   return (
-    <Dialog
+    <DialogWrapper
       open={modalType === ModalsType.SHOW_INTERVIEW_TRANSCRIPTION}
+      modalTitle={'Transcription'}
+      modalDescription={'Here you can see transcription'}
       onOpenChange={onCloseModal}
     >
-      <DialogContent className="bg-white sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Transcription</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Here you can see transcription
-          </DialogDescription>
-        </DialogHeader>
+      <>
         {transcription.map((item, i) => (
           <p key={i}>{item}</p>
         ))}
-      </DialogContent>
-    </Dialog>
+      </>
+    </DialogWrapper>
   )
 }

@@ -1,12 +1,5 @@
 import React, { FC } from 'react'
 import * as z from 'zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import {
   clearModalValue,
@@ -18,6 +11,7 @@ import { useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
 export interface IProps {}
 
@@ -54,49 +48,41 @@ export const EditValueProposition: FC<IProps> = () => {
   }
 
   return (
-    <Dialog
+    <DialogWrapper
       open={modalType === ModalsType.EDIT_UPWORK_VALUE_PROPOSITION}
+      modalTitle={'Edit value proposition'}
+      modalDescription={'Enter your professional value proposition'}
       onOpenChange={onCloseModal}
     >
-      <DialogContent className="bg-white sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
-            Edit your value proposition
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Enter your professional value proposition
-          </DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4"
-          autoComplete="off"
-        >
-          <div className="grid grid-cols-1 gap-4">
-            <div className="grid gap-2">
-              <label htmlFor="message">Value Proposition</label>
-              <Textarea
-                id="valueProposition"
-                placeholder="Enter your value proposition here"
-                className="min-h-[200px]"
-                {...register('valueProposition')}
-                defaultValue={valueProposition}
-              />
-            </div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+        autoComplete="off"
+      >
+        <div className="grid grid-cols-1 gap-4">
+          <div className="grid gap-2">
+            <label htmlFor="message">Value Proposition</label>
+            <Textarea
+              id="valueProposition"
+              placeholder="Enter your value proposition here"
+              className="min-h-[200px]"
+              {...register('valueProposition')}
+              defaultValue={valueProposition}
+            />
+          </div>
 
-            {errors.valueProposition && (
-              <span className="text-sm text-red-500">
-                {errors.valueProposition.message}
-              </span>
-            )}
-          </div>
-          <div className="flex justify-end">
-            <Button variant="default" type="submit">
-              Save
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+          {errors.valueProposition && (
+            <span className="text-sm text-red-500">
+              {errors.valueProposition.message}
+            </span>
+          )}
+        </div>
+        <div className="flex justify-end">
+          <Button variant="default" type="submit">
+            Save
+          </Button>
+        </div>
+      </form>
+    </DialogWrapper>
   )
 }
