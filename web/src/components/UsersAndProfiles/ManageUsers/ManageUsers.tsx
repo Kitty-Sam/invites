@@ -1,27 +1,18 @@
 import React, { FC } from 'react'
 import * as z from 'zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import {
   clearModalValue,
   closeModal,
   ModalsType,
-  saveModalValue,
-  showModal,
 } from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import { Button } from '@/components/ui/button'
-import { CircleX, Search, UserPlus } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { CircleX, UserPlus } from 'lucide-react'
 import { SearchInputCustom } from '@/components/shared/SearchInputCustom/SearchInputCustom'
+import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
 const allUsers = [
   {
@@ -86,17 +77,13 @@ export const ManageUsers: FC<IProps> = () => {
   }
 
   return (
-    <Dialog
+    <DialogWrapper
       open={modalType === ModalsType.MANAGE_UPWORK_USERS}
+      modalTitle={'Manage Users'}
+      modalDescription={'You can add up to 3 users'}
       onOpenChange={onCloseModal}
     >
-      <DialogContent className="bg-white sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Manage Users</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            You can add up to 3 users
-          </DialogDescription>
-        </DialogHeader>
+      <>
         <div className="space-x-3">
           {selectedUsers.map(
             (user: { name: string; email: string }, index: number) => (
@@ -149,18 +136,12 @@ export const ManageUsers: FC<IProps> = () => {
             </div>
           ))}
         </div>
-        {/*<form*/}
-        {/*  onSubmit={handleSubmit(onSubmit)}*/}
-        {/*  className="space-y-4"*/}
-        {/*  autoComplete="off"*/}
-        {/*>*/}
         <div className="flex justify-end">
-          <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
-            <span>Save</span>
+          <Button variant="default" type="submit">
+            Save
           </Button>
         </div>
-        {/*</form>*/}
-      </DialogContent>
-    </Dialog>
+      </>
+    </DialogWrapper>
   )
 }

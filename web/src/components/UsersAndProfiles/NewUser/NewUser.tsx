@@ -1,19 +1,17 @@
 import React, { FC } from 'react'
 import * as z from 'zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { useDispatch } from 'react-redux'
-import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
+import {
+  clearModalValue,
+  closeModal,
+  ModalsType,
+} from '@/store/reducers/modalReducer'
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
+import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
 export interface IProps {}
 
@@ -37,6 +35,11 @@ export const NewUser: FC<IProps> = () => {
   const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useDispatch()
 
+  const onCloseModal = () => {
+    dispatch(closeModal())
+    dispatch(clearModalValue())
+  }
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log('data', data)
     dispatch(closeModal())
@@ -44,47 +47,41 @@ export const NewUser: FC<IProps> = () => {
   }
 
   return (
-    <Dialog
+    <DialogWrapper
       open={modalType === ModalsType.ADD_UPWORK_USER}
-      onOpenChange={() => dispatch(closeModal())}
+      modalTitle={'Add User'}
+      modalDescription={'Here you can add Upwork users'}
+      onOpenChange={onCloseModal}
     >
-      <DialogContent className="bg-white sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Add User</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Here you can add Upwork users
-          </DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4"
-          autoComplete="off"
-        >
-          <div className="grid grid-cols-1 gap-4">
-            <div className="grid gap-2">
-              <InputCustom
-                id="goLoginId"
-                type="text"
-                label="Gologin ID"
-                required
-                {...register('goLoginId', {
-                  required: 'Gologin ID is required',
-                })}
-              />
-              {errors.goLoginId && (
-                <span className="text-sm text-red-500">
-                  {errors.goLoginId.message}
-                </span>
-              )}
-            </div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+        autoComplete="off"
+      >
+        <div className="grid grid-cols-1 gap-4">
+          <div className="grid gap-2">
+            <InputCustom
+              id="goLoginId"
+              type="text"
+              label="Gologin ID"
+              required
+              {...register('goLoginId', {
+                required: 'Gologin ID is required',
+              })}
+            />
+            {errors.goLoginId && (
+              <span className="text-sm text-red-500">
+                {errors.goLoginId.message}
+              </span>
+            )}
           </div>
-          <div className="flex justify-end">
-            <Button className="bg-blue-500 hover:bg-blue-600" type="submit">
-              <span>Save</span>
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+        <div className="flex justify-end">
+          <Button variant="default" type="submit">
+            Save
+          </Button>
+        </div>
+      </form>
+    </DialogWrapper>
   )
 }
