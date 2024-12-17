@@ -8,12 +8,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Edit, Share, Trash2 } from 'lucide-react'
-import React, { FC } from 'react'
+import React from 'react'
 import { IProfile } from '@/interfaces/profile.interface'
 import { PaginationCustom } from '@/components/shared/PaginationCustom/PaginationCustom'
-import { IUser } from '@/interfaces/user.interface'
 import { useAppDispatch, useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import { PageType, showPage } from '@/store/reducers/pageReducer'
 import {
   ModalsType,
@@ -21,24 +20,52 @@ import {
   showModal,
 } from '@/store/reducers/modalReducer'
 import { DeleteProfile } from '@/components/UsersAndProfiles/DeleteProfile/DeleteProfile'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+import {
+  DELETE_UPWORK_PROFILE_MUTATION,
+  UPWORK_PROFILES_QUERY,
+} from '@/services/profile.graphql.service'
 
 interface IProps {
-  profiles: IProfile[] | IUser[]
+  profiles: IProfile[]
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
   setCurrentProfile: any
 }
 
-export const ProfilesTable: FC<IProps> = ({
+export const ProfilesTable = ({
   profiles,
   currentPage,
   totalPages,
   onPageChange,
   setCurrentProfile,
-}) => {
+}: IProps) => {
   const dispatch = useAppDispatch()
   const modalType = useAppSelector(getCurrentModalType)
+  const modalValue = useAppSelector(getCurrentModalValue)
+
+  const [deleteUpworkProfile] = useMutation(DELETE_UPWORK_PROFILE_MUTATION, {
+    refetchQueries: [{ query: UPWORK_PROFILES_QUERY }],
+    onCompleted: () => {
+      toast.success('UpworkProfile deleted')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  const handleDeleteUpworkProfile = (id: number) => {
+    console.log('handleDeleteUpworkProfile id', id)
+    deleteUpworkProfile({
+      variables: {
+        id,
+      },
+    })
+  }
+
+  console.log('profiles', profiles)
 
   return (
     <>
@@ -63,10 +90,15 @@ export const ProfilesTable: FC<IProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profiles.map((profile) => (
+              {profiles.map((profile: IProfile) => (
                 <TableRow key={profile.id}>
-                  <TableCell>{profile.name}</TableCell>
-                  <TableCell>{profile.users.join(', ')}</TableCell>
+                  <TableCell>{profile.title}</TableCell>
+                  <TableCell>
+                    {profile.upworkUsers
+                      ?.map((user) => user.userName)
+                      .join(', ')}
+                  </TableCell>
+                  <TableCell></TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
@@ -96,9 +128,15 @@ export const ProfilesTable: FC<IProps> = ({
                         <Trash2 className="h-4 w-4" />
                       </Button>
 
-                      {modalType === ModalsType.DELETE_UPWORK_PROFILE && (
-                        <DeleteProfile />
-                      )}
+                      {modalType === ModalsType.DELETE_UPWORK_PROFILE &&
+                        modalValue && (
+                          <DeleteProfile
+                            profileId={modalValue}
+                            handleDeleteUpworkProfile={
+                              handleDeleteUpworkProfile
+                            }
+                          />
+                        )}
                     </div>
                   </TableCell>
                 </TableRow>

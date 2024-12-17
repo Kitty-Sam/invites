@@ -12,7 +12,7 @@ interface AppProps {
   children?: ReactNode
 }
 
-const App = ({ children }: AppProps) => (
+export const App = ({ children }: AppProps) => (
   <FatalErrorBoundary page={FatalErrorPage}>
     <Provider store={store}>
       <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
@@ -21,5 +21,3 @@ const App = ({ children }: AppProps) => (
     </Provider>
   </FatalErrorBoundary>
 )
-
-export default App

@@ -1,5 +1,4 @@
 import * as z from 'zod'
-import { FC } from 'react'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import {
   Dialog,
@@ -21,11 +20,11 @@ import { EStatus } from '@/enums/invite-status.enum'
 import { useMutation } from '@redwoodjs/web'
 import { navigate, routes } from '@redwoodjs/router'
 import { useApolloClient } from '@apollo/client'
-import { QUERY } from '@/components/Invite/InvitesCell/InvitesCell'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
+import { GET_INVITES_QUERY } from '@/services/invite.graphql.service'
 
 //Добавление нового инвайта
 const CREATE_INVITE_MUTATION = gql`
@@ -78,7 +77,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewInvite: FC<IProps> = () => {
+export const NewInvite = () => {
   const {
     register,
     handleSubmit,
@@ -98,7 +97,7 @@ export const NewInvite: FC<IProps> = () => {
       onCompleted: () => {
         console.log('Invite created')
         client.refetchQueries({
-          include: [QUERY],
+          include: [GET_INVITES_QUERY],
         })
         navigate(routes.invites())
       },

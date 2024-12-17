@@ -1,5 +1,9 @@
+import { IUser } from '@/interfaces/user.interface'
+
 export interface IProfile {
-  id: string
-  name: string
-  users: string[]
+  id: number
+  title: string
+  valueProposition: string
+  interviews: string[]
+  upworkUsers: IUser[]
 }

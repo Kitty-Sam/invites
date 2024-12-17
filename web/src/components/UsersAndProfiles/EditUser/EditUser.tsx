@@ -21,20 +21,34 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { X } from 'lucide-react'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
-
-export interface IProps {}
+import { IUser } from '@/interfaces/user.interface'
 
 const formSchema = z.object({
-  fullName: z.string().min(2, {
-    message: 'fullName should be at least 2 characters.',
-  }),
-  email: z.string().email({
-    message: 'Please enter a valid email address.',
-  }),
-  goLoginId: z.string().min(2, {
-    message: 'goLogin should be at least 2 characters.',
-  }),
-  specialties: z.array(z.string()),
+  fullName: z
+    .string()
+    .min(2, {
+      message: 'fullName should be at least 2 characters.',
+    })
+    .optional(),
+  upworkUserId: z
+    .string()
+    .min(2, {
+      message: 'Upwork User Id should be at least 2 characters.',
+    })
+    .optional(),
+  email: z
+    .string()
+    .email({
+      message: 'Please enter a valid email address.',
+    })
+    .optional(),
+  goLoginId: z
+    .string()
+    .min(2, {
+      message: 'goLogin should be at least 2 characters.',
+    })
+    .optional(),
+  upworkProfiles: z.array(z.number()),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -50,10 +64,25 @@ export const AVAILABLE_SPECIALTIES = [
   'Lead generation',
 ]
 
-export const EditUser: FC<IProps> = () => {
-  const modalType = useAppSelector(getCurrentModalType)
-  const user = useAppSelector(getCurrentModalValue)
+export type IProps = {
+  user: IUser
+  handleUpdateUpworkUser: (
+    id: number,
+    email?: string,
+    upworkUserId?: string,
+    userName?: string,
+    goLoginId?: string,
+    profileIds?: number[]
+  ) => void
+  profiles: { id: number; title: string }[]
+}
 
+export const EditUser = ({
+  user,
+  handleUpdateUpworkUser,
+  profiles,
+}: IProps) => {
+  const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useDispatch()
 
   const {
@@ -65,10 +94,10 @@ export const EditUser: FC<IProps> = () => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      fullName: user?.name || '',
+      fullName: user?.userName || '',
       email: user?.email || '',
       goLoginId: user?.goLoginId || '',
-      specialties: user?.specialties || [],
+      upworkProfiles: user?.upworkProfiles.map((pr) => pr.id) || [],
     },
   })
 
@@ -77,32 +106,53 @@ export const EditUser: FC<IProps> = () => {
     dispatch(clearModalValue())
   }
 
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('')
-  const [userSpecialties, setUserSpecialties] = useState<string[]>(
-    user?.specialties
+  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<string | null>(
+    null
+  )
+  const [userSpecialtyIds, setUserSpecialtyIds] = useState<number[]>(
+    user?.upworkProfiles.map((pr) => pr.id)
   )
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    // dispatch(closeModal())
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    handleUpdateUpworkUser(
+      user.id,
+      data.email,
+      data.upworkUserId,
+      data.fullName,
+      data.goLoginId,
+      data.upworkProfiles
+    )
+    dispatch(closeModal())
     reset()
   }
 
   useEffect(() => {
-    setValue('specialties', user?.specialties)
+    setValue(
+      'upworkProfiles',
+      user?.upworkProfiles.map((pr) => pr.id)
+    )
   }, [user])
 
   const addSpecialty = () => {
-    if (selectedSpecialty && !userSpecialties.includes(selectedSpecialty)) {
-      setValue('specialties', [...userSpecialties, selectedSpecialty])
-      setUserSpecialties([...userSpecialties, selectedSpecialty])
-      setSelectedSpecialty('')
+    if (
+      selectedSpecialtyId &&
+      !userSpecialtyIds.includes(Number(selectedSpecialtyId))
+    ) {
+      setValue('upworkProfiles', [
+        ...userSpecialtyIds,
+        Number(selectedSpecialtyId),
+      ])
+      setUserSpecialtyIds([...userSpecialtyIds, Number(selectedSpecialtyId)])
+      setSelectedSpecialtyId('')
     }
   }
 
-  const removeSpecialty = (specialty: string) => {
-    const updatedSpecialties = userSpecialties.filter((s) => s !== specialty)
-    setValue('specialties', updatedSpecialties)
-    setUserSpecialties(updatedSpecialties)
+  const removeSpecialty = (specialtyId: number) => {
+    const updatedSpecialties = userSpecialtyIds.filter(
+      (sId) => sId !== specialtyId
+    )
+    setValue('upworkProfiles', updatedSpecialties)
+    setUserSpecialtyIds(updatedSpecialties)
   }
 
   return (
@@ -123,11 +173,8 @@ export const EditUser: FC<IProps> = () => {
               id="fullName"
               type="text"
               label="User Name"
-              required
-              {...register('fullName', {
-                required: 'Full Name is required',
-              })}
-              defaultValue={user?.name}
+              {...register('fullName')}
+              defaultValue={user?.userName}
             />
             {errors.fullName && (
               <span className="text-sm text-red-500">
@@ -137,13 +184,24 @@ export const EditUser: FC<IProps> = () => {
           </div>
           <div className="grid gap-2">
             <InputCustom
+              id="upworkUserId"
+              type="text"
+              label="Upwork User ID"
+              {...register('upworkUserId')}
+              defaultValue={user?.upworkUserId}
+            />
+            {errors.upworkUserId && (
+              <span className="text-sm text-red-500">
+                {errors.upworkUserId.message}
+              </span>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <InputCustom
               id="email"
               type="email"
               label="E-mail"
-              required
-              {...register('email', {
-                required: 'E-mail is required',
-              })}
+              {...register('email')}
               defaultValue={user?.email}
             />
             {errors.email && (
@@ -157,10 +215,7 @@ export const EditUser: FC<IProps> = () => {
               id="goLoginId"
               type="text"
               label="Gologin ID"
-              required
-              {...register('goLoginId', {
-                required: 'GoLoginId is required',
-              })}
+              {...register('goLoginId')}
               defaultValue={user?.goLoginId}
             />
             {errors.goLoginId && (
@@ -174,20 +229,20 @@ export const EditUser: FC<IProps> = () => {
           <label className="text-sm font-medium">Specialized profiles</label>
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
-              {userSpecialties.map((profile) => (
+              {userSpecialtyIds.map((id) => (
                 <Badge
-                  key={profile}
+                  key={id}
                   variant="secondary"
                   className="flex items-center gap-1"
                 >
-                  {profile}
+                  {profiles.find((el) => el.id === id).title}
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-4 w-4 p-0 hover:bg-transparent"
                     onClick={(e) => {
                       e.stopPropagation()
-                      removeSpecialty(profile)
+                      removeSpecialty(id)
                     }}
                   >
                     <X className="h-3 w-3" />
@@ -197,18 +252,16 @@ export const EditUser: FC<IProps> = () => {
             </div>
             <div className="flex gap-2">
               <Select
-                value={selectedSpecialty}
-                onValueChange={setSelectedSpecialty}
+                value={selectedSpecialtyId}
+                onValueChange={setSelectedSpecialtyId}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a specialty" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AVAILABLE_SPECIALTIES.filter(
-                    (specialty) => !getValues('specialties').includes(specialty)
-                  ).map((specialty) => (
-                    <SelectItem key={specialty} value={specialty}>
-                      {specialty}
+                  {profiles.map((specialty) => (
+                    <SelectItem key={specialty.id} value={String(specialty.id)}>
+                      {specialty.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -218,7 +271,7 @@ export const EditUser: FC<IProps> = () => {
                 variant="outline"
                 className="shrink-0"
                 onClick={addSpecialty}
-                disabled={!selectedSpecialty}
+                disabled={!selectedSpecialtyId}
               >
                 Add
               </Button>

@@ -50,7 +50,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const ManageUsers: FC<IProps> = () => {
+export const ManageUsers = ({}: IProps) => {
   const {
     register,
     handleSubmit,

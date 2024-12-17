@@ -6,12 +6,19 @@ import {
 } from '@/store/reducers/modalReducer'
 import { Button } from '@/components/ui/button'
 import { useAppDispatch, useAppSelector } from '@/store/store'
-import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { getCurrentModalType } from '@/store/selectors'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
-export const DeleteProfile = () => {
+export interface IProps {
+  profileId: number
+  handleDeleteUpworkProfile: (id: number) => void
+}
+
+export const DeleteProfile = ({
+  profileId,
+  handleDeleteUpworkProfile,
+}: IProps) => {
   const modalType = useAppSelector(getCurrentModalType)
-  const profileId = useAppSelector(getCurrentModalValue)
 
   const dispatch = useAppDispatch()
 
@@ -31,7 +38,15 @@ export const DeleteProfile = () => {
         <Button variant="secondary" onClick={onCloseModal}>
           Cancel
         </Button>
-        <Button variant="destructive">Delete</Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            handleDeleteUpworkProfile(profileId)
+            onCloseModal()
+          }}
+        >
+          Delete
+        </Button>
       </div>
     </DialogWrapper>
   )

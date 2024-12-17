@@ -1,5 +1,4 @@
 import React, { FC, ReactNode } from 'react'
-import { ModalsType } from '@/store/reducers/modalReducer'
 import {
   Dialog,
   DialogDescription,

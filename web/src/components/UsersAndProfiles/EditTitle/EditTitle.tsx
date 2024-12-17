@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import * as z from 'zod'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import {
@@ -8,12 +8,20 @@ import {
 } from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { getCurrentModalType } from '@/store/selectors'
 import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { Button } from '@/components/ui/button'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
+import { IProfile } from '@/interfaces/profile.interface'
 
-export interface IProps {}
+export interface IProps {
+  oldProfile: IProfile
+  handleUpdateUpworkProfile: (
+    id: number,
+    title?: string,
+    valueProposition?: string
+  ) => void
+}
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -23,17 +31,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const EditTitle: FC<IProps> = () => {
+export const EditTitle = ({
+  handleUpdateUpworkProfile,
+  oldProfile,
+}: IProps) => {
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<FormData>()
 
   const modalType = useAppSelector(getCurrentModalType)
-  const title = useAppSelector(getCurrentModalValue)
   const dispatch = useDispatch()
 
   const onCloseModal = () => {
@@ -42,7 +51,7 @@ export const EditTitle: FC<IProps> = () => {
   }
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log('data', data)
+    handleUpdateUpworkProfile(oldProfile.id, data.title)
     onCloseModal()
     reset()
   }
@@ -67,11 +76,8 @@ export const EditTitle: FC<IProps> = () => {
               id="title"
               type="text"
               label="Title"
-              required
-              {...register('title', {
-                required: 'Title is required',
-              })}
-              defaultValue={title}
+              {...register('title')}
+              defaultValue={oldProfile.title}
             />
             {errors.title && (
               <span className="text-sm text-red-500">

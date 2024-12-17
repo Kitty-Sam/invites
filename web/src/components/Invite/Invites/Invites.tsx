@@ -23,6 +23,7 @@ import { ModalsType, showModal } from '@/store/reducers/modalReducer'
 import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
 import { useDispatch } from 'react-redux'
 import { SearchInputCustom } from '@/components/shared/SearchInputCustom/SearchInputCustom'
+import { getTotalPages } from '@/helpers/pagination/getTotalPages'
 
 export const ITEMS_PER_PAGE = 5
 
@@ -46,7 +47,7 @@ export interface IProps {
   totalItems: number
 }
 
-const Invites: FC<IProps> = ({
+export const Invites = ({
   invites,
   onResendInvite,
   onUpdateInvite,
@@ -57,12 +58,12 @@ const Invites: FC<IProps> = ({
   searchQuery,
   setSearchQuery,
   totalItems,
-}) => {
+}: IProps) => {
   const [_, startTransition] = useTransition()
   const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useDispatch()
 
-  const totalPages = totalItems ? Math.ceil(totalItems / ITEMS_PER_PAGE) : 1
+  const totalPages = totalItems ? getTotalPages(totalItems, ITEMS_PER_PAGE) : 1
 
   const handleDeactivate = (id: number) => {
     onUpdateInvite(id)
@@ -192,5 +193,3 @@ const Invites: FC<IProps> = ({
     </>
   )
 }
-
-export default Invites

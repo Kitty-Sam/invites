@@ -23,7 +23,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const EditValueProposition: FC<IProps> = () => {
+export const EditValueProposition = ({}: IProps) => {
   const {
     register,
     handleSubmit,
