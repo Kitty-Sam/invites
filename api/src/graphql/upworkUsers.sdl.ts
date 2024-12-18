@@ -11,6 +11,7 @@ export const schema = gql`
   }
 
   type UpworkUserPagination {
+    upworkUsersPerPage: [UpworkUser!]!
     upworkUsers: [UpworkUser!]!
     totalUserItems: Int!
   }

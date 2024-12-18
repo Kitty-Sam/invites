@@ -5,7 +5,6 @@ import { EUsersOrProfilesMode } from '@/enums/users-profiles-mode.enum'
 import { NewUser } from '@/components/UsersAndProfiles/NewUser/NewUser'
 import { NewProfile } from '@/components/UsersAndProfiles/NewProfile/NewProfile'
 import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
-import { IProfile } from '@/interfaces/profile.interface'
 import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentPageType } from '@/store/selectors'
@@ -14,15 +13,18 @@ import { EditProfile } from '@/components/UsersAndProfiles/EditProfile/EditProfi
 import { PageType } from '@/store/reducers/pageReducer'
 import { useQuery } from '@redwoodjs/web'
 import { getTotalPages } from '@/helpers/pagination/getTotalPages'
-import { UPWORK_USERS_QUERY } from '@/services/user.graphql.service'
-import { UPWORK_PROFILES_QUERY } from '@/services/profile.graphql.service'
+import { UPWORK_USERS_QUERY } from '@/queries/user.graphql.query'
+import {
+  UPWORK_PROFILE_BY_ID_QUERY,
+  UPWORK_PROFILES_QUERY,
+} from '@/queries/profile.graphql.query'
 
 const ITEMS_PER_PAGE = 5
 
 export const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
   const [currentPage, setCurrentPage] = useState(1)
-  const [currentProfile, setCurrentProfile] = useState<IProfile | null>(null)
+  const [currentProfileId, setCurrentProfileId] = useState<number | null>(null)
 
   const modalType = useAppSelector(getCurrentModalType)
   const pageType = useAppSelector(getCurrentPageType)
@@ -36,21 +38,29 @@ export const UsersAndProfiles = () => {
     variables: { page: currentPage, pageSize: ITEMS_PER_PAGE },
   })
 
-  const { upworkUsers = [], totalUserItems } = allUsers?.upworkUsers || {}
-  const { upworkProfiles = [], totalProfileItems } =
-    allProfiles?.upworkProfiles || {}
+  const { data: currentProfile } = useQuery(UPWORK_PROFILE_BY_ID_QUERY, {
+    variables: { id: currentProfileId },
+    skip: !currentProfileId,
+  })
 
-  const totalUserPages = totalUserItems
-    ? getTotalPages(totalUserItems, ITEMS_PER_PAGE)
-    : 1
-  const totalProfilesPages = totalProfileItems
-    ? getTotalPages(totalProfileItems, ITEMS_PER_PAGE)
-    : 1
+  const {
+    upworkUsersPerPage = [],
+    totalUserItems,
+    upworkUsers,
+  } = allUsers?.upworkUsers || {}
+  const {
+    upworkProfilesPerPage = [],
+    totalProfileItems,
+    upworkProfiles,
+  } = allProfiles?.upworkProfiles || {}
 
   return (
     <>
-      {pageType === PageType.EDIT_UPWORK_PROFILE ? (
-        <EditProfile profile={currentProfile} />
+      {pageType === PageType.EDIT_UPWORK_PROFILE && currentProfile ? (
+        <EditProfile
+          profile={currentProfile.upworkProfile}
+          users={upworkUsers}
+        />
       ) : (
         <>
           <div className="flex justify-between">
@@ -106,19 +116,27 @@ export const UsersAndProfiles = () => {
             <>
               <UsersTable
                 profiles={upworkProfiles}
-                users={upworkUsers}
+                users={upworkUsersPerPage}
                 currentPage={currentPage}
-                totalPages={totalUserPages}
+                totalPages={
+                  totalUserItems
+                    ? getTotalPages(totalUserItems, ITEMS_PER_PAGE)
+                    : 1
+                }
                 onPageChange={setCurrentPage}
               />
             </>
           ) : (
             <ProfilesTable
-              profiles={upworkProfiles}
+              profiles={upworkProfilesPerPage}
               currentPage={currentPage}
-              totalPages={totalProfilesPages}
+              totalPages={
+                totalProfileItems
+                  ? getTotalPages(totalProfileItems, ITEMS_PER_PAGE)
+                  : 1
+              }
               onPageChange={setCurrentPage}
-              setCurrentProfile={setCurrentProfile}
+              setCurrentProfileId={setCurrentProfileId}
             />
           )}
         </>

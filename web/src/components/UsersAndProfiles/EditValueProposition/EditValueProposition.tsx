@@ -8,12 +8,20 @@ import {
 } from '@/store/reducers/modalReducer'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { getCurrentModalType } from '@/store/selectors'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
+import { IProfile } from '@/interfaces/profile.interface'
 
-export interface IProps {}
+export interface IProps {
+  oldProfile: IProfile
+  handleUpdateUpworkProfile: (
+    id: number,
+    title?: string,
+    valueProposition?: string
+  ) => void
+}
 
 const formSchema = z.object({
   valueProposition: z.string().min(2, {
@@ -23,17 +31,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const EditValueProposition = ({}: IProps) => {
+export const EditValueProposition = ({
+  oldProfile,
+  handleUpdateUpworkProfile,
+}: IProps) => {
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<FormData>()
 
   const modalType = useAppSelector(getCurrentModalType)
-  const valueProposition = useAppSelector(getCurrentModalValue)
   const dispatch = useDispatch()
 
   const onCloseModal = () => {
@@ -42,7 +51,7 @@ export const EditValueProposition = ({}: IProps) => {
   }
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log('data', data)
+    handleUpdateUpworkProfile(oldProfile.id, undefined, data.valueProposition)
     onCloseModal()
     reset()
   }
@@ -67,7 +76,7 @@ export const EditValueProposition = ({}: IProps) => {
               placeholder="Enter your value proposition here"
               className="min-h-[200px]"
               {...register('valueProposition')}
-              defaultValue={valueProposition}
+              defaultValue={oldProfile.valueProposition}
             />
           </div>
 

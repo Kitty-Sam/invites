@@ -14,23 +14,33 @@ export const upworkProfiles: QueryResolvers['upworkProfiles'] = async ({
 }) => {
   const skip = (page - 1) * pageSize
 
-  const [upworkProfiles, totalProfileItems] = await Promise.all([
-    db.upworkProfile.findMany({
-      skip,
-      take: pageSize,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        upworkUsers: true,
-      },
-    }),
-    db.upworkProfile.count(),
-  ])
+  const [upworkProfilesPerPage, totalProfileItems, upworkProfiles] =
+    await Promise.all([
+      db.upworkProfile.findMany({
+        skip,
+        take: pageSize,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          upworkUsers: true,
+        },
+      }),
+      db.upworkProfile.count(),
+      db.upworkProfile.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          upworkUsers: true,
+        },
+      }),
+    ])
 
   return {
-    upworkProfiles,
+    upworkProfilesPerPage,
     totalProfileItems,
+    upworkProfiles,
   }
 }
 
@@ -52,10 +62,24 @@ export const updateUpworkProfile: MutationResolvers['updateUpworkProfile'] = ({
   id,
   input,
 }) => {
-  return db.upworkProfile.update({
-    data: input,
+  const { userIds, ...profileData } = input
+
+  const updatedProfile = db.upworkProfile.update({
     where: { id },
+    data: {
+      ...profileData,
+      upworkUsers: userIds
+        ? {
+            set: userIds.map((userId) => ({ id: userId })),
+          }
+        : undefined,
+    },
+    include: {
+      upworkUsers: true,
+    },
   })
+
+  return updatedProfile
 }
 
 export const deleteUpworkProfile: MutationResolvers['deleteUpworkProfile'] =

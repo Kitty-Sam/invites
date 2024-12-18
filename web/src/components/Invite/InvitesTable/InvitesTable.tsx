@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@redwoodjs/web'
+
+import { EStatus } from '@/enums/invite-status.enum'
+import { Invites } from '@/components/Invite/Invites/Invites'
 import {
   GET_INVITES_QUERY,
   RESEND_INVITE,
   UPDATE_INVITE,
-} from '@/services/invite.graphql.service'
-import { EStatus } from '@/enums/invite-status.enum'
-import { Invites } from '@/components/Invite/Invites/Invites'
+} from '@/queries/invite.graphql.query'
 
 const ITEMS_PER_PAGE = 5
 

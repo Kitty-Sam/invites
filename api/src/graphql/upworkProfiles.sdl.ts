@@ -10,6 +10,7 @@ export const schema = gql`
   }
 
   type UpworkProfilePagination {
+    upworkProfilesPerPage: [UpworkProfile!]!
     upworkProfiles: [UpworkProfile!]!
     totalProfileItems: Int!
   }
@@ -27,6 +28,7 @@ export const schema = gql`
   input UpdateUpworkProfileInput {
     title: String
     valueProposition: String
+    userIds: [Int!]
   }
 
   type Mutation {
