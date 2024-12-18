@@ -2,19 +2,25 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { CircleX, Edit, FileType2, RefreshCwOff, UserPlus } from 'lucide-react'
 import { IProfile } from '@/interfaces/profile.interface'
-import React, { FC } from 'react'
+import React from 'react'
 import {
   ModalsType,
   saveModalValue,
   showModal,
 } from '@/store/reducers/modalReducer'
 import { useAppDispatch, useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import { EditTitle } from '@/components/UsersAndProfiles/EditTitle/EditTitle'
 import { ShowTranscription } from '@/components/UsersAndProfiles/ShowTranscription/ShowTranscription'
 import { ManageUsers } from '@/components/UsersAndProfiles/ManageUsers/ManageUsers'
 import { EditValueProposition } from '@/components/UsersAndProfiles/EditValueProposition/EditValueProposition'
 import { NewPortfolioProject } from '@/components/UsersAndProfiles/NewPortfolioProject/NewPortfolioProject'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+import {
+  UPDATE_UPWORK_PROFILE_MUTATION,
+  UPWORK_PROFILES_QUERY,
+} from '@/services/profile.graphql.service'
 
 export interface IProps {
   profile: IProfile
@@ -46,9 +52,36 @@ const interviews = [
   { name: 'Monica J.', date: 'December 29, 2024', transcription: ['hello'] },
 ]
 
-export const EditProfile: FC<IProps> = ({ profile }) => {
+export const EditProfile = ({ profile }: IProps) => {
   const dispatch = useAppDispatch()
   const modalType = useAppSelector(getCurrentModalType)
+  const modalValue = useAppSelector(getCurrentModalValue)
+
+  const [updateUpworkProfile, { loading, error }] = useMutation(
+    UPDATE_UPWORK_PROFILE_MUTATION,
+    {
+      refetchQueries: [{ query: UPWORK_PROFILES_QUERY }],
+      onCompleted: () => {
+        toast.success('UpworkProfile updated')
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
+  const handleUpdateUpworkProfile = (
+    id: number,
+    title?: string,
+    valueProposition?: string
+  ) => {
+    updateUpworkProfile({
+      variables: {
+        id,
+        input: { title, valueProposition },
+      },
+    })
+  }
 
   return (
     <>
@@ -64,25 +97,29 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
           {/* Header Section */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-semibold">{profile.name}</span>
+              <span className="text-2xl font-semibold">{profile.title}</span>
               <Button
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
                 onClick={() => {
-                  dispatch(saveModalValue(profile.name))
+                  dispatch(saveModalValue(profile.title))
                   dispatch(showModal(ModalsType.EDIT_UPWORK_PROFILE_TITLE))
                 }}
               >
                 <Edit className="h-4 w-4" />
               </Button>
 
-              {modalType === ModalsType.EDIT_UPWORK_PROFILE_TITLE && (
-                <EditTitle />
-              )}
+              {modalType === ModalsType.EDIT_UPWORK_PROFILE_TITLE &&
+                modalValue && (
+                  <EditTitle
+                    oldProfile={profile}
+                    handleUpdateUpworkProfile={handleUpdateUpworkProfile}
+                  />
+                )}
             </div>
             <p className="border-b pb-4 text-muted-foreground">
-              Specializes in {profile.name}
+              Specializes in {profile.title}
             </p>
           </div>
 
@@ -216,7 +253,7 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                   onClick={() => {
                     dispatch(
                       saveModalValue(
-                        profile.users.map((user) => ({
+                        profile.upworkUsers.map((user) => ({
                           name: user,
                           email: '',
                         }))
@@ -232,12 +269,12 @@ export const EditProfile: FC<IProps> = ({ profile }) => {
                 )}
               </div>
               <div className="space-y-3">
-                {profile.users.map((user) => (
+                {profile.upworkUsers.map((user) => (
                   <div
                     className="inline-flex items-center space-x-2 rounded bg-gray-100 px-3 py-1 text-sm text-black"
-                    key={user}
+                    key={user.id}
                   >
-                    <span>{user}</span>
+                    <span>{user.userName}</span>
                     <CircleX className="h-4 w-4" />
                   </div>
                 ))}

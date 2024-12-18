@@ -1,7 +1,10 @@
+import { IProfile } from '@/interfaces/profile.interface'
+
 export interface IUser {
-  id: string
-  name: string
-  email: string
+  id: number
   goLoginId: string
-  specialties: string[]
+  email?: string
+  userName?: string
+  upworkUserId?: string
+  upworkProfiles?: IProfile[]
 }

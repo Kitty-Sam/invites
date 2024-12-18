@@ -11,7 +11,7 @@ import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 
 export interface IProps {}
 
-export const ShowTranscription: FC<IProps> = () => {
+export const ShowTranscription = ({}: IProps) => {
   const modalType = useAppSelector(getCurrentModalType)
   const transcription = useAppSelector(getCurrentModalValue)
 

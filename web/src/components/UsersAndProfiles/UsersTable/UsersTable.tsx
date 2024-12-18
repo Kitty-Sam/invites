@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -14,31 +14,94 @@ import { PaginationCustom } from '@/components/shared/PaginationCustom/Paginatio
 import { IProfile } from '@/interfaces/profile.interface'
 import { EditUser } from '@/components/UsersAndProfiles/EditUser/EditUser'
 import { useAppDispatch, useAppSelector } from '@/store/store'
-import { getCurrentModalType } from '@/store/selectors'
+import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import {
   ModalsType,
   saveModalValue,
   showModal,
 } from '@/store/reducers/modalReducer'
 import { DeleteUser } from '@/components/UsersAndProfiles/DeleteUser/DeleteUser'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+import { useApolloClient } from '@apollo/client'
+import {
+  DELETE_UPWORK_USER_MUTATION,
+  UPDATE_UPWORK_USER_MUTATION,
+  UPWORK_USERS_QUERY,
+} from '@/services/user.graphql.service'
+import { UPWORK_PROFILES_QUERY } from '@/services/profile.graphql.service'
 
 interface IProps {
-  users: IUser[] | IProfile[]
+  profiles: { id: number; title: string }[]
+  users: IUser[]
   currentPage: number
   totalPages: number
-  onPageChange: any
+  onPageChange: (value: number) => void
 }
 
-export const UsersTable: FC<IProps> = ({
+export const UsersTable = ({
   users,
+  profiles,
   currentPage,
   totalPages,
   onPageChange,
-}) => {
+}: IProps) => {
   const modalType = useAppSelector(getCurrentModalType)
-  const dispatch = useAppDispatch()
+  const modalValue = useAppSelector(getCurrentModalValue)
 
-  const [currentUser, setCurrentUser] = useState<IUser | null>(null)
+  const dispatch = useAppDispatch()
+  const client = useApolloClient()
+
+  const [deleteUpworkUser] = useMutation(DELETE_UPWORK_USER_MUTATION, {
+    onCompleted: () => {
+      client.refetchQueries({
+        include: [UPWORK_USERS_QUERY, UPWORK_PROFILES_QUERY],
+      })
+      toast.success('UpworkUser deleted')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  const [updateUpworkUser, { loading, error }] = useMutation(
+    UPDATE_UPWORK_USER_MUTATION,
+    {
+      onCompleted: () => {
+        client.refetchQueries({
+          include: [UPWORK_USERS_QUERY, UPWORK_PROFILES_QUERY],
+        })
+        toast.success('UpworkUser updated')
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
+  const handleDeleteUpworkUser = (id: number) => {
+    deleteUpworkUser({
+      variables: {
+        id,
+      },
+    })
+  }
+
+  const handleUpdateUpworkUser = (
+    id: number,
+    email?: string,
+    upworkUserId?: string,
+    userName?: string,
+    goLoginId?: string,
+    profileIds?: number[]
+  ) => {
+    updateUpworkUser({
+      variables: {
+        id,
+        input: { userName, upworkUserId, email, goLoginId, profileIds },
+      },
+    })
+  }
 
   return (
     <>
@@ -66,7 +129,9 @@ export const UsersTable: FC<IProps> = ({
                 <TableRow key={user.id}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{user.name}</div>
+                      <div className="font-medium">
+                        {user.userName} {user.upworkUserId}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         {user.email}
                       </div>
@@ -75,13 +140,13 @@ export const UsersTable: FC<IProps> = ({
                   <TableCell>{user.goLoginId}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.specialties.map(
-                        (profile: string, index: number) => (
+                      {user.upworkProfiles?.map(
+                        (pr: IProfile, index: number) => (
                           <span
                             key={index}
                             className="inline-flex items-center rounded-full border  px-2 py-1 text-xs font-medium"
                           >
-                            {profile}
+                            {pr.title}
                           </span>
                         )
                       )}
@@ -102,9 +167,14 @@ export const UsersTable: FC<IProps> = ({
                         Edit
                       </Button>
 
-                      {modalType === ModalsType.EDIT_UPWORK_USER && (
-                        <EditUser />
-                      )}
+                      {modalType === ModalsType.EDIT_UPWORK_USER &&
+                        modalValue && (
+                          <EditUser
+                            profiles={profiles}
+                            user={modalValue}
+                            handleUpdateUpworkUser={handleUpdateUpworkUser}
+                          />
+                        )}
                       <Button variant="outline" size="sm" className="px-2">
                         <Share className="h-4 w-4" />
                       </Button>
@@ -119,9 +189,13 @@ export const UsersTable: FC<IProps> = ({
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                      {modalType === ModalsType.DELETE_UPWORK_USER && (
-                        <DeleteUser />
-                      )}
+                      {modalType === ModalsType.DELETE_UPWORK_USER &&
+                        modalValue && (
+                          <DeleteUser
+                            userId={modalValue}
+                            handleDeleteUpworkUser={handleDeleteUpworkUser}
+                          />
+                        )}
                     </div>
                   </TableCell>
                 </TableRow>

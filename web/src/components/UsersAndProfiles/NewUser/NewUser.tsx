@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
@@ -12,8 +12,13 @@ import {
 import { useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
-
-export interface IProps {}
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+import { useApolloClient } from '@apollo/client'
+import {
+  CREATE_UPWORK_USER_MUTATION,
+  UPWORK_USERS_QUERY,
+} from '@/services/user.graphql.service'
 
 const formSchema = z.object({
   goLoginId: z.string().min(2, {
@@ -23,12 +28,28 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewUser: FC<IProps> = () => {
+export const NewUser = () => {
+  const client = useApolloClient()
+
+  const [createUpworkUser, { loading, error }] = useMutation(
+    CREATE_UPWORK_USER_MUTATION,
+    {
+      onCompleted: () => {
+        client.refetchQueries({
+          include: [UPWORK_USERS_QUERY],
+        })
+        toast.success('UpworkUser created')
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<FormData>()
 
@@ -40,8 +61,8 @@ export const NewUser: FC<IProps> = () => {
     dispatch(clearModalValue())
   }
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log('data', data)
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    createUpworkUser({ variables: { input: { goLoginId: data.goLoginId } } })
     dispatch(closeModal())
     reset()
   }

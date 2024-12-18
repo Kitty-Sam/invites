@@ -14,12 +14,12 @@ export const schema = gql`
     updatedAt: DateTime!
   }
 
-   type InvitePagination {
+  type InvitePagination {
     invites: [Invite!]!
     totalItems: Int!
   }
 
-   input InviteFilterInput {
+  input InviteFilterInput {
     status: String
     lastName: String
   }
@@ -32,7 +32,7 @@ export const schema = gql`
     inviteDuration: Int!
     status: String!
     expiresIn: DateTime!
-    lastName: String
+    lastName: String!
     message: String
   }
 
@@ -46,11 +46,13 @@ export const schema = gql`
     inviteDuration: Int!
   }
 
-
   type Query {
-    invites(page: Int, pageSize: Int, whereCondition: InviteFilterInput): InvitePagination! @requireAuth
+    invites(
+      page: Int
+      pageSize: Int
+      whereCondition: InviteFilterInput
+    ): InvitePagination! @requireAuth
   }
-
 
   type Mutation {
     resendInvite(id: Int!, input: ResendInviteInput!): Invite! @requireAuth

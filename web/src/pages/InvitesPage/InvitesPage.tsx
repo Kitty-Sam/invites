@@ -1,7 +1,7 @@
-import InvitesCell from 'src/components/Invite/InvitesCell'
+import { InvitesTable } from '@/components/Invite/InvitesTable/InvitesTable'
 
 const InvitesPage = () => {
-  return <InvitesCell />
+  return <InvitesTable />
 }
 
 export default InvitesPage

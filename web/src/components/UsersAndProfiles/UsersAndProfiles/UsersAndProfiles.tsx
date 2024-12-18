@@ -6,71 +6,18 @@ import { NewUser } from '@/components/UsersAndProfiles/NewUser/NewUser'
 import { NewProfile } from '@/components/UsersAndProfiles/NewProfile/NewProfile'
 import { TabNavigationCustom } from '@/components/shared/TabNavigationCustom/TabNavigationCustom'
 import { IProfile } from '@/interfaces/profile.interface'
-import { IUser } from '@/interfaces/user.interface'
 import { ButtonWithIconCustom } from '@/components/shared/ButtonWithIconCustom/ButtonWithIconCustom'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentPageType } from '@/store/selectors'
 import { ModalsType, showModal } from '@/store/reducers/modalReducer'
-import { UsersAndProfilesLayout } from '@/layouts/UsersAndProfilesLayout/UsersAndProfilesLayout'
 import { EditProfile } from '@/components/UsersAndProfiles/EditProfile/EditProfile'
 import { PageType } from '@/store/reducers/pageReducer'
+import { useQuery } from '@redwoodjs/web'
+import { getTotalPages } from '@/helpers/pagination/getTotalPages'
+import { UPWORK_USERS_QUERY } from '@/services/user.graphql.service'
+import { UPWORK_PROFILES_QUERY } from '@/services/profile.graphql.service'
 
 const ITEMS_PER_PAGE = 5
-
-// Mock data
-const users = [
-  {
-    id: '1',
-    name: 'Stephanie Sharkey',
-    email: 'steph55@gmail.com',
-    goLoginId: 'fadsfhsa66×719x',
-    specialties: ['Web Design', 'UX design', 'Frontend development'],
-  },
-  {
-    id: '2',
-    name: 'Joshua Jones',
-    email: 'j.jones@aol.com',
-    goLoginId: 'kjlkf43u345h',
-    specialties: ['Machine Learning'],
-  },
-  {
-    id: '3',
-    name: 'Rhonda Rhodes',
-    email: 'r.rhodes@outlook.com',
-    goLoginId: 'fjsdbfbqjwt',
-    specialties: ['Product Management', 'Marketing Strategy'],
-  },
-  {
-    id: '4',
-    name: 'James Hall',
-    email: 'j.hall367@outlook.com',
-    goLoginId: 'gkmgotmoboteo17132',
-    specialties: ['3D Animation'],
-  },
-] as IUser[]
-
-const profiles = [
-  {
-    id: '1',
-    name: 'Web Design',
-    users: ['Stephanie Sharkey'],
-  },
-  {
-    id: '2',
-    name: 'Machine Learning',
-    users: ['Joshua Jones'],
-  },
-  {
-    id: '3',
-    name: 'Product Management',
-    users: ['Rhonda Rhodes'],
-  },
-  {
-    id: '4',
-    name: '3D Animation',
-    users: ['James Hall', 'Rhonda Rhodes'],
-  },
-] as IProfile[]
 
 export const UsersAndProfiles = () => {
   const [activeTab, setActiveTab] = useState<string>(EUsersOrProfilesMode.USERS)
@@ -79,22 +26,29 @@ export const UsersAndProfiles = () => {
 
   const modalType = useAppSelector(getCurrentModalType)
   const pageType = useAppSelector(getCurrentPageType)
-
   const dispatch = useAppDispatch()
 
-  const currentData =
-    activeTab === EUsersOrProfilesMode.USERS ? users : profiles
+  const { data: allUsers } = useQuery(UPWORK_USERS_QUERY, {
+    variables: { page: currentPage, pageSize: ITEMS_PER_PAGE },
+  })
 
-  const totalPages = Math.ceil(currentData.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const { data: allProfiles } = useQuery(UPWORK_PROFILES_QUERY, {
+    variables: { page: currentPage, pageSize: ITEMS_PER_PAGE },
+  })
 
-  const paginatedData = currentData.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  )
+  const { upworkUsers = [], totalUserItems } = allUsers?.upworkUsers || {}
+  const { upworkProfiles = [], totalProfileItems } =
+    allProfiles?.upworkProfiles || {}
+
+  const totalUserPages = totalUserItems
+    ? getTotalPages(totalUserItems, ITEMS_PER_PAGE)
+    : 1
+  const totalProfilesPages = totalProfileItems
+    ? getTotalPages(totalProfileItems, ITEMS_PER_PAGE)
+    : 1
 
   return (
-    <UsersAndProfilesLayout>
+    <>
       {pageType === PageType.EDIT_UPWORK_PROFILE ? (
         <EditProfile profile={currentProfile} />
       ) : (
@@ -151,23 +105,24 @@ export const UsersAndProfiles = () => {
           {activeTab === EUsersOrProfilesMode.USERS ? (
             <>
               <UsersTable
-                users={paginatedData}
+                profiles={upworkProfiles}
+                users={upworkUsers}
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={totalUserPages}
                 onPageChange={setCurrentPage}
               />
             </>
           ) : (
             <ProfilesTable
-              profiles={paginatedData}
+              profiles={upworkProfiles}
               currentPage={currentPage}
-              totalPages={totalPages}
+              totalPages={totalProfilesPages}
               onPageChange={setCurrentPage}
               setCurrentProfile={setCurrentProfile}
             />
           )}
         </>
       )}
-    </UsersAndProfilesLayout>
+    </>
   )
 }

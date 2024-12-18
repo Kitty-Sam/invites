@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import * as z from 'zod'
 import { SubmitHandler, useForm } from '@redwoodjs/forms'
 import {
@@ -20,18 +20,23 @@ import {
 import { AVAILABLE_SPECIALTIES } from '@/components/UsersAndProfiles/EditUser/EditUser'
 import { Button } from '@/components/ui/button'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
-
-export interface IProps {}
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+import {
+  CREATE_UPWORK_PROFILE_MUTATION,
+  UPWORK_PROFILES_QUERY,
+} from '@/services/profile.graphql.service'
+import { useApolloClient } from '@apollo/client'
 
 const formSchema = z.object({
-  speciality: z.string().min(2, {
+  title: z.string().min(2, {
     message: 'Speciality must be at least 2 characters.',
   }),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export const NewProfile: FC<IProps> = () => {
+export const NewProfile = () => {
   const {
     register,
     handleSubmit,
@@ -42,9 +47,25 @@ export const NewProfile: FC<IProps> = () => {
 
   const modalType = useAppSelector(getCurrentModalType)
   const dispatch = useDispatch()
+  const client = useApolloClient()
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log('data', data)
+  const [createUpworkProfile, { loading, error }] = useMutation(
+    CREATE_UPWORK_PROFILE_MUTATION,
+    {
+      onCompleted: () => {
+        client.refetchQueries({
+          include: [UPWORK_PROFILES_QUERY],
+        })
+        toast.success('UpworkProfile created')
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    createUpworkProfile({ variables: { input: { title: data.title } } })
     dispatch(closeModal())
     reset()
   }
@@ -55,7 +76,7 @@ export const NewProfile: FC<IProps> = () => {
   }
 
   const onProfileSpecialityChange = (value: string) => {
-    setValue('speciality', value)
+    setValue('title', value)
   }
 
   return (
