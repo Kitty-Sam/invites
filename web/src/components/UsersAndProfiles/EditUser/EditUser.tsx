@@ -10,7 +10,7 @@ import {
   ModalsType,
 } from '@/store/reducers/modalReducer'
 import { useAppSelector } from '@/store/store'
-import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
+import { getCurrentModalType } from '@/store/selectors'
 import {
   Select,
   SelectContent,
@@ -125,13 +125,6 @@ export const EditUser = ({
     dispatch(closeModal())
     reset()
   }
-
-  useEffect(() => {
-    setValue(
-      'upworkProfiles',
-      user?.upworkProfiles.map((pr) => pr.id)
-    )
-  }, [user])
 
   const addSpecialty = () => {
     if (

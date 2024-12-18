@@ -26,6 +26,8 @@ import {
   DELETE_UPWORK_PROFILE_MUTATION,
   UPWORK_PROFILES_QUERY,
 } from '@/services/profile.graphql.service'
+import { useApolloClient } from '@apollo/client'
+import { UPWORK_USERS_QUERY } from '@/services/user.graphql.service'
 
 interface IProps {
   profiles: IProfile[]
@@ -43,12 +45,16 @@ export const ProfilesTable = ({
   setCurrentProfile,
 }: IProps) => {
   const dispatch = useAppDispatch()
+  const client = useApolloClient()
+
   const modalType = useAppSelector(getCurrentModalType)
   const modalValue = useAppSelector(getCurrentModalValue)
 
   const [deleteUpworkProfile] = useMutation(DELETE_UPWORK_PROFILE_MUTATION, {
-    refetchQueries: [{ query: UPWORK_PROFILES_QUERY }],
     onCompleted: () => {
+      client.refetchQueries({
+        include: [UPWORK_USERS_QUERY, UPWORK_PROFILES_QUERY],
+      })
       toast.success('UpworkProfile deleted')
     },
     onError: (error) => {
@@ -57,15 +63,12 @@ export const ProfilesTable = ({
   })
 
   const handleDeleteUpworkProfile = (id: number) => {
-    console.log('handleDeleteUpworkProfile id', id)
     deleteUpworkProfile({
       variables: {
         id,
       },
     })
   }
-
-  console.log('profiles', profiles)
 
   return (
     <>
@@ -86,6 +89,7 @@ export const ProfilesTable = ({
               <TableRow>
                 <TableHead>Profile</TableHead>
                 <TableHead>Users</TableHead>
+                <TableHead></TableHead>
                 <TableHead className="w-[100px]"></TableHead>
               </TableRow>
             </TableHeader>

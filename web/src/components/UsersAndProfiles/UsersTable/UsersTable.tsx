@@ -55,7 +55,7 @@ export const UsersTable = ({
   const [deleteUpworkUser] = useMutation(DELETE_UPWORK_USER_MUTATION, {
     onCompleted: () => {
       client.refetchQueries({
-        include: [UPWORK_USERS_QUERY],
+        include: [UPWORK_USERS_QUERY, UPWORK_PROFILES_QUERY],
       })
       toast.success('UpworkUser deleted')
     },
