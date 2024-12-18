@@ -5,7 +5,6 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
-import { logger } from 'src/lib/logger'
 
 const ITEMS_PER_PAGE = 5
 
@@ -15,7 +14,7 @@ export const upworkUsers: QueryResolvers['upworkUsers'] = async ({
 }) => {
   const skip = (page - 1) * pageSize
 
-  const [upworkUsers, totalUserItems] = await Promise.all([
+  const [upworkUsersPerPage, totalUserItems, upworkUsers] = await Promise.all([
     db.upworkUser.findMany({
       skip,
       take: pageSize,
@@ -27,11 +26,13 @@ export const upworkUsers: QueryResolvers['upworkUsers'] = async ({
       },
     }),
     db.upworkUser.count(),
+    db.upworkUser.findMany(),
   ])
 
   return {
-    upworkUsers,
+    upworkUsersPerPage,
     totalUserItems,
+    upworkUsers,
   }
 }
 

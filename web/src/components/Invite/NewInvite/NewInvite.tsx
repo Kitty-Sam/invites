@@ -24,7 +24,7 @@ import { InputCustom } from '@/components/shared/InputCustom/InputCustom'
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType } from '@/store/selectors'
 import { closeModal, ModalsType } from '@/store/reducers/modalReducer'
-import { GET_INVITES_QUERY } from '@/services/invite.graphql.service'
+import { GET_INVITES_QUERY } from '@/queries/invite.graphql.query'
 
 //Добавление нового инвайта
 const CREATE_INVITE_MUTATION = gql`

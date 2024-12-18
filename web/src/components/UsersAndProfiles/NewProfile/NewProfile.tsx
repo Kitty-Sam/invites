@@ -22,11 +22,12 @@ import { Button } from '@/components/ui/button'
 import { DialogWrapper } from '@/components/shared/DialogWrapper/DialogWrapper'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
+
+import { useApolloClient } from '@apollo/client'
 import {
   CREATE_UPWORK_PROFILE_MUTATION,
   UPWORK_PROFILES_QUERY,
-} from '@/services/profile.graphql.service'
-import { useApolloClient } from '@apollo/client'
+} from '@/queries/profile.graphql.query'
 
 const formSchema = z.object({
   title: z.string().min(2, {

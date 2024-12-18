@@ -18,7 +18,7 @@ import { useApolloClient } from '@apollo/client'
 import {
   CREATE_UPWORK_USER_MUTATION,
   UPWORK_USERS_QUERY,
-} from '@/services/user.graphql.service'
+} from '@/queries/user.graphql.query'
 
 const formSchema = z.object({
   goLoginId: z.string().min(2, {

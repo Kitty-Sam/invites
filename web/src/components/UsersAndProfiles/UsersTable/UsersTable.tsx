@@ -28,8 +28,8 @@ import {
   DELETE_UPWORK_USER_MUTATION,
   UPDATE_UPWORK_USER_MUTATION,
   UPWORK_USERS_QUERY,
-} from '@/services/user.graphql.service'
-import { UPWORK_PROFILES_QUERY } from '@/services/profile.graphql.service'
+} from '@/queries/user.graphql.query'
+import { UPWORK_PROFILES_QUERY } from '@/queries/profile.graphql.query'
 
 interface IProps {
   profiles: { id: number; title: string }[]

@@ -14,27 +14,23 @@ import { PaginationCustom } from '@/components/shared/PaginationCustom/Paginatio
 import { useAppDispatch, useAppSelector } from '@/store/store'
 import { getCurrentModalType, getCurrentModalValue } from '@/store/selectors'
 import { PageType, showPage } from '@/store/reducers/pageReducer'
-import {
-  ModalsType,
-  saveModalValue,
-  showModal,
-} from '@/store/reducers/modalReducer'
+import { ModalsType, showModal } from '@/store/reducers/modalReducer'
 import { DeleteProfile } from '@/components/UsersAndProfiles/DeleteProfile/DeleteProfile'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
+import { useApolloClient } from '@apollo/client'
 import {
   DELETE_UPWORK_PROFILE_MUTATION,
   UPWORK_PROFILES_QUERY,
-} from '@/services/profile.graphql.service'
-import { useApolloClient } from '@apollo/client'
-import { UPWORK_USERS_QUERY } from '@/services/user.graphql.service'
+} from '@/queries/profile.graphql.query'
+import { UPWORK_USERS_QUERY } from '@/queries/user.graphql.query'
 
 interface IProps {
   profiles: IProfile[]
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
-  setCurrentProfile: any
+  setCurrentProfileId: (any: number) => void
 }
 
 export const ProfilesTable = ({
@@ -42,7 +38,7 @@ export const ProfilesTable = ({
   currentPage,
   totalPages,
   onPageChange,
-  setCurrentProfile,
+  setCurrentProfileId,
 }: IProps) => {
   const dispatch = useAppDispatch()
   const client = useApolloClient()
@@ -110,7 +106,7 @@ export const ProfilesTable = ({
                         size="sm"
                         className="flex items-center gap-2"
                         onClick={() => {
-                          setCurrentProfile(profile)
+                          setCurrentProfileId(profile.id)
                           dispatch(showPage(PageType.EDIT_UPWORK_PROFILE))
                         }}
                       >
@@ -125,7 +121,6 @@ export const ProfilesTable = ({
                         size="sm"
                         className="px-2"
                         onClick={() => {
-                          dispatch(saveModalValue(profile.id))
                           dispatch(showModal(ModalsType.DELETE_UPWORK_PROFILE))
                         }}
                       >
